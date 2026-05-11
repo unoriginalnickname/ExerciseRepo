@@ -14,11 +14,21 @@ namespace GaragePractice
         public Airplane(string regPlate, string color, string numWheels, string fuel, string other) : base(regPlate, color, numWheels, fuel, other)
         {
         }
-
+        public override void SetUniqueProperty(string prop)
+        {
+            int value;
+            int.TryParse(prop, out value);
+            NumEngines = value;
+        }
+        public override string GetUniquePropertyString()
+        {
+            return "Number of engines: ";
+        }
         public override string GetUniqueProperty()
         {
-            return "Number of engines: " + NumEngines;
+            return GetUniquePropertyString() + NumEngines;
         }
+
         public int NumEngines { get; set; }
     }
     public class Motorcycle : Vehicle
@@ -30,9 +40,19 @@ namespace GaragePractice
         public Motorcycle(string regPlate, string color, string numWheels, string fuel, string other) : base(regPlate, color, numWheels, fuel, other)
         {
         }
+        public override void SetUniqueProperty(string prop)
+        {
+            int volume;
+            int.TryParse(prop, out volume);
+            CylinderVolume = volume;
+        }
+        public override string GetUniquePropertyString()
+        {
+            return "Cylinder volume: ";
+        }
         public override string GetUniqueProperty()
         {
-            return "Cylinder volume: " + CylinderVolume;
+            return GetUniquePropertyString() + CylinderVolume;
         }
         public int CylinderVolume { get; set; }
     }
@@ -45,9 +65,19 @@ namespace GaragePractice
         public Car(string regPlate, string color, string numWheels, string fuel, string other) : base(regPlate, color, numWheels, fuel, other)
         {
         }
+        public override string GetUniquePropertyString()
+        {
+            return "Number of seats: ";
+        }
         public override string GetUniqueProperty()
         {
-            return "Number of seats: " + NumberOfSeats;
+            return GetUniquePropertyString() + NumberOfSeats;
+        }
+        public override void SetUniqueProperty(string prop)
+        {
+            int value;
+            int.TryParse(prop, out value);
+            NumberOfSeats = value;
         }
         public int NumberOfSeats { get; set; }
 
@@ -61,9 +91,19 @@ namespace GaragePractice
         public Bus(string regPlate, string color, string numWheels, string fuel, string other) : base(regPlate, color, numWheels, fuel, other)
         {
         }
+        public override void SetUniqueProperty(string prop)
+        {
+            int value;
+            int.TryParse(prop, out value);
+            NumberOfSeats = value;
+        }
+        public override string GetUniquePropertyString()
+        {
+            return "Number of seats: ";
+        }
         public override string GetUniqueProperty()
         {
-            return "Number of seats: " + NumberOfSeats;
+            return GetUniquePropertyString() + NumberOfSeats;
         }
         public int NumberOfSeats { get; set; }
     }
@@ -76,9 +116,19 @@ namespace GaragePractice
         public Boat(string regPlate, string color, string numWheels, string fuel, string other) : base(regPlate, color, numWheels, fuel, other)
         {
         }
+        public override void SetUniqueProperty(string prop)
+        {
+            int value;
+            int.TryParse(prop, out value);
+            NumberOfSeats = value;
+        }
         public override string GetUniqueProperty()
         {
-            return "Number of seats: " + NumberOfSeats;
+            return GetUniquePropertyString() + NumberOfSeats;
+        }
+        public override string GetUniquePropertyString()
+        {
+            return "Number of seats: ";
         }
         public int NumberOfSeats { get; set; }
     }

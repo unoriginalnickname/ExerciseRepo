@@ -15,7 +15,7 @@ namespace GaragePractice
 
         public static void PrintVehicles(IEnumerable<VehicleDisplayModel> enumerable)
         {
-            if(enumerable.Count() < 1)
+            if(enumerable.Count() == 0)
             {
                 Console.WriteLine("Garage appears empty. ");
             }

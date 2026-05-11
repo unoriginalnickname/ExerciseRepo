@@ -21,7 +21,9 @@ namespace GaragePractice
             Fueltype = fuel;
             Other = other;
         }
- 
+        public abstract void SetUniqueProperty(string property);
+        public abstract string GetUniquePropertyString();
+
         public abstract string GetUniqueProperty();
 
         //public static bool operator ==(Vehicle a, string b)

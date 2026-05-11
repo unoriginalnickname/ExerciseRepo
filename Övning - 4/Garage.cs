@@ -52,27 +52,31 @@ namespace GaragePractice
             return false;
         }
 
-
         public Vehicle? GetVehicleWithRegNumber(string registryNumber)
         {
             return garageSpace.Where(x => x != null && x.RegistryNumber == registryNumber).FirstOrDefault();
         }
+
         public IEnumerable<Vehicle> GetAllVehicles()
         {
             return garageSpace.OfType<Vehicle>();
         }
+
         public int TotalFreeSlots()
         {
             return garageSpace.Length - garageSpace.Count(x => x != null);
         }
+
         public int TotalSlots()
         {
             return garageSpace.Length;
         }
+
         public int UsedSlotsCount()
         {
             return garageSpace.Count(x => x != null);
         }
+
         private void SearchVehicleSpecifics()
         {
             //Söka efter fordon utifrån en egenskap eller flera (alla möjliga kombinationer från
@@ -81,9 +85,7 @@ namespace GaragePractice
             //○ Alla motorcyklar som är rosa och har 3 hjul.
             //○ Alla lastbilar
             //○ Alla röda fordon
-
             //else did not find any vehicle matching the exact search
-
         }
 
         public void AutoPopulateGarage()
@@ -92,8 +94,18 @@ namespace GaragePractice
             //garageSpace[0] = new Airplane("123", "green", "8", FuelType.ZeroPointModule, "nothing");
             garageSpace[1] = new Boat("123-ABC", "blue", "2", "Gas", "nothing");
             garageSpace[2] = new Car("456-DEF", "yellow", "4", "Diesel", "nothing");
-            garageSpace[3] = new Car("789-GHI", "black", "4", "Anti-gravity", "nothing");
+            garageSpace[3] = new Airplane("789-GHI", "black", "4", "Anti-gravity", "nothing");
+            garageSpace[4] = new Car("ABC-393", "black", "4", "Gasoline", "nothing");
+            garageSpace[5] = new Bus("ABC-999", "black", "4", "Gasoline", "nothing");
+            garageSpace[6] = new Motorcycle("ABC-234", "pink", "3", "Gasoline", "nothing");
+            garageSpace[7] = new Motorcycle("qqq-728", "pink", "3", "ZeroPointEnergy", "nothing");
+            garageSpace[8] = new Motorcycle("ZZZ-562", "pink", "3", "Diesel", "nothing");
+            garageSpace[9] = new Motorcycle("ZZZ-123", "black", "3", "Diesel", "nothing");
         }
+        //○ Alla svarta fordon med fyra hjul.
+        //○ Alla motorcyklar som är rosa och har 3 hjul.
+        //○ Alla lastbilar
+        //○ Alla röda fordon
 
         public Vehicle[] GetGarageContents()
         {
