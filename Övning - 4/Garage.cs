@@ -20,14 +20,11 @@ namespace GaragePractice
             garageSpace = new Vehicle[garageSize];
         }
 
+        //fancy syntax
         public void ParkVehicle(Vehicle vehicle)
         {
-            for (int i = 0; i < garageSpace.Length; i++)
-                if (garageSpace[i] == null)
-                {
-                    garageSpace[i] = vehicle;
-                    return;
-                }
+            if (FindFirstFreeParkingSlot() is int parkingSlot)
+                garageSpace[parkingSlot] = vehicle;
         }
 
         private int? FindFirstFreeParkingSlot()

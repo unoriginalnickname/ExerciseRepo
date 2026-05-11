@@ -16,10 +16,10 @@ namespace GaragePractice
 
         //Command listCommand = new("list", "Optional: -vehicletype");
         
-        Command findVehiclesCommand = new("find", "Usage: find -vehicletype Motorcycle -regnum AbC-123 -color Green -wheels 2 -fuel Gasoline");
+        Command findVehiclesCommand = new("find", "Usage: find --vehicletype Motorcycle --regnum AbC-123 --color Green --wheels 2 --fuel Gasoline");
 
-        Command unparkVehicleCommand = new("unpark", "Usage: unpark -regnum ABC-123");
-        Command parkVehicleCommand = new("park", "Usage: park -regnum ABC-123 -vehicletype Motorcycle -color Green -wheels 2 -fuel Element155");
+        Command unparkVehicleCommand = new("unpark", "Usage: unpark --regnum ABC-123");
+        Command parkVehicleCommand = new("park", "Usage: park --regnum ABC-123 --vehicletype Motorcycle --color Green --wheels 2 --fuel Element155");
         Command exitCommand = new("exit");
 
 
