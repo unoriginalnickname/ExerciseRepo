@@ -29,7 +29,7 @@ namespace PersonalregisterPractice
 
             while (true)
             {
-                command.Parse(Console.ReadLine().Split()).Invoke();
+                command.Parse(Console.ReadLine()!.Split()).Invoke();
             }
         }
     }

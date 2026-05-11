@@ -1,0 +1,103 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace GaragePractice
+{
+    public class Garage //static is impossible because we must use parameterized constructor
+    {
+        private Vehicle[] garageSpace;
+        private readonly int defaultSize = 15;
+
+        public Garage()
+        {
+            Console.WriteLine("Garage: creating garage with default size " + defaultSize);
+            garageSpace = new Vehicle[defaultSize];
+        }
+
+        public Garage(int garageSize)
+        {
+            garageSpace = new Vehicle[garageSize];
+        }
+
+        public void ParkVehicle(Vehicle vehicle)
+        {
+            for (int i = 0; i < garageSpace.Length; i++)
+                if (garageSpace[i] == null)
+                {
+                    garageSpace[i] = vehicle;
+                    return;
+                }
+        }
+
+        private int? FindFirstFreeParkingSlot()
+        {
+            for (int i = 0; i < garageSpace.Length; i++)
+                if (garageSpace[i] == null)
+                    return i;
+            return null;
+        }
+
+        public bool UnParkVehicle(string? regPlateNumber)
+        {
+            for (int i = 0; i < garageSpace.Length; i++)
+            {
+                if (garageSpace[i] != null)
+                {
+                    if (garageSpace[i].RegistryNumber == regPlateNumber)
+                        garageSpace[i] = null;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        public Vehicle? GetVehicleWithRegNumber(string registryNumber)
+        {
+            return garageSpace.Where(x => x != null && x.RegistryNumber == registryNumber).FirstOrDefault();
+        }
+        public IEnumerable<Vehicle> GetAllVehicles()
+        {
+            return garageSpace.OfType<Vehicle>();
+        }
+        public int TotalFreeSlots()
+        {
+            return garageSpace.Length - garageSpace.Count(x => x != null);
+        }
+        public int TotalSlots()
+        {
+            return garageSpace.Length;
+        }
+        public int UsedSlotsCount()
+        {
+            return garageSpace.Count(x => x != null);
+        }
+        private void SearchVehicleSpecifics()
+        {
+            //Söka efter fordon utifrån en egenskap eller flera (alla möjliga kombinationer från
+            //basklassen Vehicle). Exempelvis:
+            //○ Alla svarta fordon med fyra hjul.
+            //○ Alla motorcyklar som är rosa och har 3 hjul.
+            //○ Alla lastbilar
+            //○ Alla röda fordon
+
+            //else did not find any vehicle matching the exact search
+
+        }
+
+        public void AutoPopulateGarage()
+        {
+            Console.WriteLine("Garage: Autopopulating...");
+            //garageSpace[0] = new Airplane("123", "green", "8", FuelType.ZeroPointModule, "nothing");
+            garageSpace[1] = new Boat("123-ABC", "blue", "2", "Gas", "nothing");
+            garageSpace[2] = new Car("456-DEF", "yellow", "4", "Diesel", "nothing");
+            garageSpace[3] = new Car("789-GHI", "black", "4", "Anti-gravity", "nothing");
+        }
+
+        public Vehicle[] GetGarageContents()
+        {
+            return garageSpace;
+        }
+    }
+}
