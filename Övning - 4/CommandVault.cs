@@ -176,16 +176,6 @@ namespace GaragePractice
                 View.PrintString("\nGarage is now autopopulated.\n");
             }
         }
-  
-
-        IEnumerable<VehicleDisplayModel> AllVehiclesToDisplayModel()
-        {
-            foreach (Vehicle v in garage.GetAllVehicles())
-            {
-                yield return VehicleToDisplayModel(v);
-
-            }
-        }
 
         private VehicleDisplayModel VehicleToDisplayModel(Vehicle vehicle)
         {
