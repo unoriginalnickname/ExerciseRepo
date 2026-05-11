@@ -23,7 +23,7 @@ namespace PersonalregisterPractice
     {
         static List<Person> db = new List<Person>();
         static RootCommand command = Commander.InitializeCommands(db);
-        static void Main(string[] args)
+        static void Main()
         {
             command.Parse("--help").Invoke(); // print help on startup
 
