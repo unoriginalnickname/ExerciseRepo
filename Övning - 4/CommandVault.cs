@@ -11,7 +11,27 @@ namespace GaragePractice
     {
         Garage garage;
         RootCommand root;
-       
+
+        Command listAllVehiclesCommand = new("listall", "Optional: -vehicletype");
+        
+        //Command findRegNumberCommand = new("findreg", "Usage: findreg -regnum ABC-123");
+        Command findVehiclesCommand = new("find", "Usage: find -wheels 2 -color Green -vehicletype Motorcycle -fuel Gasoline");
+        Command unparkVehicleCommand = new("unpark", "Usage: unpark -regnum ABC-123");
+        Command parkVehicleCommand = new("park", "Usage: park -regnum ABC-123 -type Motorcycle -color Green -wheels 2 -fuel Element155");
+        Command exitCommand = new("exit");
+
+        Option<string> registryNumberOption = new Option<string>("-regnum") { HelpName = "platenumber", Required = true };
+        
+        Option<string> wheelsOption = new("-wheels") {  HelpName = "Amount", Required = false };
+        Option<string> colorOption = new("-color") {  HelpName = "Color", Required = false };        //make sure to list all the valid color options
+        Option<string> vehicleTypeOption = new("-vehicletype") {  HelpName ="Vehicletype", Required = false };    //make sure to list all the vehicle options
+        Option<string> fuelTypeOption = new("-fuel") { HelpName = "Fuel type", Required = false };    //make sure to list all the vehicle options
+        
+        Option<string> parkWheelsOption = new("-wheels") { HelpName = "Amount", Required = true };
+        Option<string> parkColorOption = new("-color") { HelpName = "Color", Required = true };        //make sure to list all the valid color options
+        Option<string> parkVehicleType = new("-type") { HelpName = "Vehicletype", Required = true };    //make sure to list all the vehicle options
+        Option<string> parkFuelType = new("-fuel") { HelpName = "Fuel type", Required = true };    //make sure to list all the vehicle options
+
         public CommandVault()
         {
             root = new RootCommand("Use the listed commands to operate the program");
@@ -19,53 +39,41 @@ namespace GaragePractice
             SetupMenu();
         }
 
-        Command listAllVehiclesCommand = new("listall", "Optional: -vehicletype");
-        
-        Command findVehicleByRegNumberCommand = new("findreg", "Usage: findreg -regnum ABC-123");
-        Command listVehiclesWithProperties = new("listspecific", "Usage: listspecific -wheels 2 -color Green -vehicletype Motorcycle -fuel Gasoline");
-        Command unparkVehicleCommand = new("unpark", "Usage: unpark -regnum ABC-123");
-        Command parkVehicleCommand = new("park", "Usage: park -regnum ABC-123 -type Motorcycle -color Green -wheels 2 -fuel Element155");
-        Command exitCommand = new("exit");
-
-        Option<string> registryNumberOption = new Option<string>("-regnum") { HelpName = "platenumber", Required = true };
-       
-        Option<string> wheelsOption = new("-wheels") {  HelpName = "Amount", Required = false };
-       
-        Option<string> colorOption = new("-color") {  HelpName = "Color", Required = false };        //make sure to list all the valid color options
-     
-        Option<string> vehicleTypeOption = new("-vehicletype") {  HelpName ="Vehicletype", Required = false };    //make sure to list all the vehicle options
-     
-        Option<string> fuelTypeOption = new("-fuel") { HelpName = "Fuel type", Required = false };    //make sure to list all the vehicle options
-
-        Option<string> parkWheelsOption = new("-wheels") { HelpName = "Amount", Required = true };
-
-        Option<string> parkColorOption = new("-color") { HelpName = "Color", Required = true };        //make sure to list all the valid color options
-
-        Option<string> parkVehicleType = new("-type") { HelpName = "Vehicletype", Required = true };    //make sure to list all the vehicle options
-
-        Option<string> parkFuelType = new("-fuel") { HelpName = "Fuel type", Required = true };    //make sure to list all the vehicle options
-
-
-
-
-
         void InitializeCommands()
         {
-
             //exitcommand
             exitCommand.SetAction(p => run = false);
-            //list all
-
-            listAllVehiclesCommand.Add(vehicleTypeOption);
-            listAllVehiclesCommand.SetAction(p => ListAll(p.GetValue(vehicleTypeOption)));
             
-
-            //park command and options
+            //list all option
+            listAllVehiclesCommand.Add(vehicleTypeOption);
+       
+            //park options
             parkVehicleCommand.Add(registryNumberOption);
             parkVehicleCommand.Add(parkVehicleType);
             parkVehicleCommand.Add(parkFuelType);
             parkVehicleCommand.Add(parkColorOption);
             parkVehicleCommand.Add(parkWheelsOption);
+
+            //unpark options
+            unparkVehicleCommand.Add(registryNumberOption);
+
+            //findreg options
+            //findRegNumberCommand.Add(registryNumberOption);
+
+ 
+            
+            //list vehicles command 
+            findVehiclesCommand.Add(wheelsOption);
+            findVehiclesCommand.Add(colorOption);
+            findVehiclesCommand.Add(vehicleTypeOption);
+            findVehiclesCommand.Add(fuelTypeOption);
+            findVehiclesCommand.Add(registryNumberOption);
+
+            //we need to tell the command what to do with the data provided by the options
+            //findRegNumberCommand.SetAction(p => Search(regNumber: p.GetValue(registryNumberOption)));
+            listAllVehiclesCommand.SetAction(p => ListAll(p.GetValue(vehicleTypeOption)));
+            unparkVehicleCommand.SetAction(p => Unpark(p.GetValue(registryNumberOption)));
+            findVehiclesCommand.SetAction(p => Search(p.GetValue(wheelsOption), p.GetValue(colorOption), p.GetValue(vehicleTypeOption), p.GetValue(fuelTypeOption), p.GetValue(registryNumberOption)));
             parkVehicleCommand.SetAction(p =>
             {
                 string? registryNumber = p.GetValue(registryNumberOption);
@@ -80,33 +88,17 @@ namespace GaragePractice
                     garage.ParkVehicle(vehicle);
                     View.PrintString("Parked. ");
                 }
+                else
+                {
+                    View.PrintString("Can't park here.");
+                }
             });
 
 
-            //unpark command, options and action
-            unparkVehicleCommand.Add(registryNumberOption);
-            unparkVehicleCommand.SetAction(p => Unpark(p.GetValue(registryNumberOption)));
-
-            //findreg
-            findVehicleByRegNumberCommand.Add(registryNumberOption);
-
-            //we need to tell the command what to do with the data provided by the options
-            findVehicleByRegNumberCommand.SetAction(p => Search(regNumber: p.GetValue(registryNumberOption)));
-            
-            //list vehicles command 
-            listVehiclesWithProperties.Add(wheelsOption);
-            listVehiclesWithProperties.Add(colorOption);
-            listVehiclesWithProperties.Add(vehicleTypeOption);
-            listVehiclesWithProperties.Add(fuelTypeOption);
-            listVehiclesWithProperties.Add(registryNumberOption);
-
-            listVehiclesWithProperties.SetAction(p => Search(p.GetValue(wheelsOption), p.GetValue(colorOption), p.GetValue(vehicleTypeOption), p.GetValue(fuelTypeOption), p.GetValue(registryNumberOption)));
-
             //add the commands to the root command
             root.Add(listAllVehiclesCommand);
-            root.Add(findVehicleByRegNumberCommand);
-
-            root.Add(listVehiclesWithProperties);
+            //root.Add(findRegNumberCommand);
+            root.Add(findVehiclesCommand);
             root.Add(unparkVehicleCommand);
             root.Add(parkVehicleCommand);
             root.Add(exitCommand);
@@ -123,15 +115,11 @@ namespace GaragePractice
                 View.PrintVehicles(GetAllVehiclesToDisplayModel());
                 View.PrintString($"Free garage slots: {garage.TotalFreeSlots()}/{garage.TotalSlots()}");
             }
-           
         }
-
-
         void Search(string wheels = "", string color = "", string type = "", string fueltype = "", string regNumber = "")
         {
             View.PrintVehicles(SearchForVehiclesToDisplayModel(wheels, color, type, fueltype, regNumber));
         }
-
         private void Unpark(string? regNumber)
         {
             if (regNumber != null)
@@ -161,19 +149,19 @@ namespace GaragePractice
             bool parseSuccessful = int.TryParse(Console.ReadLine(), out garageSize);
             if (parseSuccessful)
             {
-                garage = new(Math.Min(garageSize, 100));
+                garage = new(Math.Max(Math.Min(garageSize, 100), 5));
             }
             else
                 garage = new();
 
-            View.PrintString("Autopopulate garage with vehicles? Y/N");
+            View.PrintString("\nAutopopulate garage with vehicles? Y/N");
             string input = View.GetInput();
 
             bool yes = string.Equals(input, "Y", StringComparison.InvariantCultureIgnoreCase);
             if (yes)
             {
                 garage.AutoPopulateGarage();
-                View.PrintString("Garage is now autopopulated.");
+                View.PrintString("\nGarage is now autopopulated.\n");
             }
         }
   
@@ -191,7 +179,6 @@ namespace GaragePractice
                 vehicles = vehicles.Where(x => string.Equals(x.GetType().Name, vehicleType, StringComparison.CurrentCultureIgnoreCase));
             if (fuelType != "")
                 vehicles = vehicles.Where(x => x.Fueltype.ToString() == fuelType);
-          
 
             foreach (Vehicle item in vehicles)
             {
@@ -206,7 +193,6 @@ namespace GaragePractice
 
             }
         }
-
 
         private VehicleDisplayModel VehicleToDisplayModel(Vehicle vehicle)
         {
