@@ -68,7 +68,7 @@ namespace GaragePractice
         }
         void Park(string? wheels = null, string? color = null, string? vehicleType = null, string? fueltype = null, string? registryNumber = null)
         {
-            if (registryNumber != null && garage.GetVehicleWithRegNumber(registryNumber) == null)
+            if (registryNumber != null && FindVehiclesToDisplayModelArrayMethod(regNumber: registryNumber).Length == 0)
             {
                 Vehicle? vehicle = (Vehicle?)Activator.CreateInstance(Type.GetType("GaragePractice." + vehicleType)!);
                 if (vehicle != null)

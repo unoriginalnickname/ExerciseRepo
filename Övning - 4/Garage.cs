@@ -50,33 +50,10 @@ namespace GaragePractice
             }
             return false;
         }
-
-        public Vehicle? GetVehicleWithRegNumber(string registryNumber)
-        {
-            return garageSpace.Where(x => x != null && x.RegistryNumber == registryNumber).FirstOrDefault();
-        }
-
   
         public Vehicle[] GetAllVehiclesToArray() // need to convert all IEnumerable to Array
         {
             return (Vehicle[])garageSpace.Clone();
-        }
-
-
-
-        public int TotalFreeSlots()
-        {
-            return garageSpace.Length - garageSpace.Count(x => x != null);
-        }
-
-        public int TotalSlots()
-        {
-            return garageSpace.Length;
-        }
-
-        public int UsedSlotsCount()
-        {
-            return garageSpace.Count(x => x != null);
         }
 
         public void AutoPopulateGarage()
