@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GaragePractice
 {
-    public class Garage //static is impossible because we must use parameterized constructor
+    public class Garage
     {
         private Vehicle[] garageSpace;
         private readonly int defaultSize = 15;
@@ -19,11 +19,10 @@ namespace GaragePractice
         {
             garageSpace = new Vehicle[garageSize];
         }
-
-        //fancy syntax
-        public void ParkVehicle(Vehicle vehicle)
+        
+        public void ParkVehicle(Vehicle vehicle) 
         {
-            if (FindFirstFreeParkingSlot() is int parkingSlot)
+            if (FindFirstFreeParkingSlot() is int parkingSlot) //fancy syntax
                 garageSpace[parkingSlot] = vehicle;
         }
 
@@ -40,18 +39,16 @@ namespace GaragePractice
             for (int i = 0; i < garageSpace.Length; i++)
             {
                 if (garageSpace[i] != null)
-                {
                     if (garageSpace[i].RegistryNumber == regPlateNumber)
                     {
                         garageSpace[i] = null;
                         return true;
                     }
-                }
             }
             return false;
         }
-  
-        public Vehicle[] GetAllVehiclesToArray() // need to convert all IEnumerable to Array
+
+        public Vehicle[] GetAllVehiclesToArray() 
         {
             return (Vehicle[])garageSpace.Clone();
         }
@@ -70,10 +67,6 @@ namespace GaragePractice
             garageSpace[8] = new Motorcycle("ZZZ-562", "pink", "3", "Diesel", "nothing");
             garageSpace[9] = new Motorcycle("ZZZ-123", "black", "3", "Diesel", "nothing");
         }
-        //○ Alla svarta fordon med fyra hjul.
-        //○ Alla motorcyklar som är rosa och har 3 hjul.
-        //○ Alla lastbilar
-        //○ Alla röda fordon
 
         public Vehicle[] GetGarageContents()
         {

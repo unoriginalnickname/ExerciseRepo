@@ -10,25 +10,21 @@ namespace GaragePractice
 {
     public class CommandVault
     {
-        
-        Garage garage;
         const int garageMinSize = 15;
+        Garage garage;
+               
         RootCommand root;
-
-        //Command listCommand = new("list", "Optional: -vehicletype");
-        
         Command findCommand = new("find", "Usage: find --vehicletype Motorcycle --regnum AbC-123 --color Green --wheels 2 --fuel Gasoline");
-
         Command unparkCommand = new("unpark", "Usage: unpark --regnum ABC-123");
         Command parkCommand = new("park", "Usage: park --regnum ABC-123 --vehicletype Motorcycle --color Green --wheels 2 --fuel Element155");
         Command exitCommand = new("exit");
 
 
         Option<string> registryNumberOption = new Option<string>("--regnum") { HelpName = "platenumber", Required = false };
-        Option<string> wheelsOption = new("--wheels") {  HelpName = "Amount", Required = false };
-        Option<string> colorOption = new("--color") {  HelpName = "Color", Required = false };        //make sure to list all the valid color options
-        Option<string> vehicleTypeOption = new("--vehicletype") {  HelpName ="Vehicletype", Required = false };    //make sure to list all the vehicle options
-        Option<string> fuelTypeOption = new("--fuel") { HelpName = "Fuel type", Required = false };    //make sure to list all the vehicle options
+        Option<string> wheelsOption = new("--wheels") {  HelpName = "Amount", Required = false }; //future implementations
+        Option<string> colorOption = new("--color") {  HelpName = "Color", Required = false };         //list all the valid color options
+        Option<string> vehicleTypeOption = new("--vehicletype") {  HelpName ="Vehicletype", Required = false };    //list all the vehicle options
+        Option<string> fuelTypeOption = new("--fuel") { HelpName = "Fuel type", Required = false };    
 
 
         Option<string> parkRegistryNumberOption = new Option<string>("--regnum") { HelpName = "platenumber", Required = true };
@@ -36,7 +32,8 @@ namespace GaragePractice
         Option<string> parkColorOption = new("--color") { HelpName = "Color", Required = true };        //make sure to list all the valid color options
         Option<string> parkVehicleType = new("--vehicletype") { HelpName = "Vehicletype", Required = true };    //make sure to list all the vehicle options
         Option<string> parkFuelType = new("--fuel") { HelpName = "Fuel type", Required = true };    //make sure to list all the vehicle options
-        //Option<string[]> uniqueTrait = new("-unique") { HelpName = "unique trait", Required = true, Arity = new ArgumentArity(1, 10)};    //make sure to list all the vehicle options
+
+
         public CommandVault()
         {
             root = new RootCommand("Garage");

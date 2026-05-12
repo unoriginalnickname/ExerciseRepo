@@ -4,7 +4,6 @@ using System.Text;
 
 namespace GaragePractice
 {
-
     public class VehicleDisplayModel
     {
         public string VehicleType { get; set; }
@@ -13,11 +12,6 @@ namespace GaragePractice
         public string NumWheels { get; set; }
         public string Fueltype { get; set; }
         public string UniqueProperties { get; set; }
-
-        public string[] GetToStringArray
-        {
-            get { return new string[] { $"Reg: {RegPlateNumber}", $"Color: {Color}", $"# wheels: {NumWheels}", $"fueltype: {Fueltype}", $"unique: {UniqueProperties}" }; }
-        }
 
         public override string ToString()
         {
