@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.CommandLine;
@@ -16,10 +17,10 @@ namespace GaragePractice
 
         //Command listCommand = new("list", "Optional: -vehicletype");
         
-        Command findVehiclesCommand = new("find", "Usage: find --vehicletype Motorcycle --regnum AbC-123 --color Green --wheels 2 --fuel Gasoline");
+        Command findCommand = new("find", "Usage: find --vehicletype Motorcycle --regnum AbC-123 --color Green --wheels 2 --fuel Gasoline");
 
-        Command unparkVehicleCommand = new("unpark", "Usage: unpark --regnum ABC-123");
-        Command parkVehicleCommand = new("park", "Usage: park --regnum ABC-123 --vehicletype Motorcycle --color Green --wheels 2 --fuel Element155");
+        Command unparkCommand = new("unpark", "Usage: unpark --regnum ABC-123");
+        Command parkCommand = new("park", "Usage: park --regnum ABC-123 --vehicletype Motorcycle --color Green --wheels 2 --fuel Element155");
         Command exitCommand = new("exit");
 
 
@@ -45,92 +46,162 @@ namespace GaragePractice
 
         void InitializeCommands()
         {
-            //exitcommand
+            parkCommand.Add(parkRegistryNumberOption);
+            parkCommand.Add(parkVehicleType);
+            parkCommand.Add(parkFuelType);
+            parkCommand.Add(parkColorOption);
+            parkCommand.Add(parkWheelsOption);
+
+            unparkCommand.Add(parkRegistryNumberOption);
+
+            findCommand.Add(registryNumberOption);
+            findCommand.Add(vehicleTypeOption);
+            findCommand.Add(wheelsOption);
+            findCommand.Add(colorOption);
+            findCommand.Add(fuelTypeOption);
+
+            unparkCommand.SetAction(p => Unpark(p.GetValue(parkRegistryNumberOption)));
+
+            findCommand.SetAction(p => 
+            Search(p.GetValue(wheelsOption), 
+            p.GetValue(colorOption), 
+            p.GetValue(vehicleTypeOption), 
+            p.GetValue(fuelTypeOption), 
+            p.GetValue(registryNumberOption)));
+
+            parkCommand.SetAction(p => 
+            Park(p.GetValue(parkWheelsOption), 
+            p.GetValue(parkColorOption), 
+            p.GetValue(parkVehicleType), 
+            p.GetValue(parkFuelType), 
+            p.GetValue(parkRegistryNumberOption)));
+
             exitCommand.SetAction(p => run = false);
 
-            //park options
-            parkVehicleCommand.Add(parkRegistryNumberOption);
-            parkVehicleCommand.Add(parkVehicleType);
-            parkVehicleCommand.Add(parkFuelType);
-            parkVehicleCommand.Add(parkColorOption);
-            parkVehicleCommand.Add(parkWheelsOption);
-            //parkVehicleCommand.Add(uniqueTrait);
-
-            //unpark options
-            unparkVehicleCommand.Add(parkRegistryNumberOption);
-
-            //find vehicles command 
-            findVehiclesCommand.Add(registryNumberOption);
-            findVehiclesCommand.Add(vehicleTypeOption);
-            findVehiclesCommand.Add(wheelsOption);
-            findVehiclesCommand.Add(colorOption);
-            findVehiclesCommand.Add(fuelTypeOption);
-
-
-            unparkVehicleCommand.SetAction(p => Unpark(p.GetValue(parkRegistryNumberOption)));
-            
-            findVehiclesCommand.SetAction(p => Search(p.GetValue(wheelsOption), p.GetValue(colorOption), p.GetValue(vehicleTypeOption), p.GetValue(fuelTypeOption), p.GetValue(registryNumberOption)));
-            
-            parkVehicleCommand.SetAction(p =>
-            {
-                string registryNumber = p.GetValue(parkRegistryNumberOption);
-                if (registryNumber != null && garage.GetVehicleWithRegNumber(registryNumber) == null)
-                {
-                    string typeName = p.GetValue(parkVehicleType)!;
-                    Vehicle? vehicle = (Vehicle?)Activator.CreateInstance(Type.GetType("GaragePractice." + typeName)!);
-                    if(vehicle != null)
-                    {
-                        vehicle.RegistryNumber = p.GetValue(parkRegistryNumberOption) ?? "";
-                        vehicle.Fueltype = p.GetValue(parkFuelType) ?? "";
-                        vehicle.Color = p.GetValue(parkColorOption) ?? "";
-                        vehicle.NumWheels = p.GetValue(parkWheelsOption) ?? "";
-
-                        View.PrintString($"Vehicle has unique property, provide value for: {vehicle.GetUniquePropertyString()}");
-
-                        vehicle.SetUniqueProperty(View.GetInput());
-                        garage.ParkVehicle(vehicle);
-                        View.PrintString("Parked. ");
-                        return;
-                    }
-                    View.PrintString("Can't park here.");
-                }
-                else
-                {
-                    View.PrintString("Can't park here.");
-                }
-            });
-
             //add the commands to the root command
-            root.Add(findVehiclesCommand);
-            root.Add(unparkVehicleCommand);
-            root.Add(parkVehicleCommand);
+            root.Add(findCommand);
+            root.Add(unparkCommand);
+            root.Add(parkCommand);
             root.Add(exitCommand);
 
         }
-        IEnumerable<VehicleDisplayModel> SearchForVehiclesToDisplayModel(string? numWheels = null, string? color = null, string? vehicleType = null, string? fuelType = null, string? regNumber = null)
+        void Park(string? wheels = null, string? color = null, string? vehicleType = null, string? fueltype = null, string? registryNumber = null)
         {
-
-            IEnumerable<Vehicle> vehicles = garage.GetAllVehicles();
-            if (regNumber != null)
-                vehicles = vehicles.Where(x => string.Equals(x.RegistryNumber, regNumber, StringComparison.CurrentCultureIgnoreCase));
-            if (numWheels != null)
-                vehicles = vehicles.Where(x => x.NumWheels == numWheels);
-            if (color != null)
-                vehicles = vehicles.Where(x => string.Equals(x.Color, color, StringComparison.OrdinalIgnoreCase));
-            if (vehicleType != null)
-                vehicles = vehicles.Where(x => string.Equals(x.GetType().Name, vehicleType, StringComparison.CurrentCultureIgnoreCase));
-            if (fuelType != null)
-                vehicles = vehicles.Where(x => x.Fueltype.ToString() == fuelType);
-
-            foreach (Vehicle item in vehicles)
+            if (registryNumber != null && garage.GetVehicleWithRegNumber(registryNumber) == null)
             {
-                yield return VehicleToDisplayModel(item);
+                Vehicle? vehicle = (Vehicle?)Activator.CreateInstance(Type.GetType("GaragePractice." + vehicleType)!);
+                if (vehicle != null)
+                {
+                    vehicle.RegistryNumber = registryNumber ?? "";
+                    vehicle.Fueltype = fueltype ?? "";
+                    vehicle.Color = color ?? "";
+                    vehicle.NumWheels = wheels ?? "";
+
+                    View.PrintString($"Vehicle has unique property, provide value for: {vehicle.GetUniquePropertyString()}");
+
+                    vehicle.SetUniqueProperty(View.GetInput());
+                    garage.ParkVehicle(vehicle);
+                    View.PrintString("Parked. ");
+                    return;
+                }
+                View.PrintString("Can't park here.");
+            }
+            else
+            {
+                View.PrintString("Can't park here.");
             }
         }
 
+        VehicleDisplayModel[] SearchForVehiclesToDisplayModelArrayMethod(string? numWheels = null, string? color = null, string? vehicleType = null, string? fuelType = null, string? regNumber = null)
+        {
+            Vehicle[] vehicles = garage.GetAllVehiclesToArray();
+            Vehicle[] vehiclesMatching = new Vehicle[vehicles.Length];
+            VehicleDisplayModel[] displayModelArray;
+
+            //get whatever is matching
+            for (int i = 0; i < vehicles.Length - 1; i++)
+            {
+                if (regNumber != null && vehicles[i] != null)
+                    if (string.Equals(vehicles[i].RegistryNumber, regNumber, StringComparison.CurrentCultureIgnoreCase))
+                        vehiclesMatching[i] = vehicles[i];
+
+                if (numWheels != null && vehicles[i] != null)
+                    if (string.Equals(vehicles[i].NumWheels, numWheels, StringComparison.CurrentCultureIgnoreCase))
+                        vehiclesMatching[i] = vehicles[i];
+
+                if (color != null && vehicles[i] != null)
+                    if (string.Equals(vehicles[i].Color, color, StringComparison.OrdinalIgnoreCase))
+                        vehiclesMatching[i] = vehicles[i];
+
+                if (vehicleType != null && vehicles[i] != null)
+                   if(string.Equals(vehicles[i].GetType().Name, vehicleType, StringComparison.CurrentCultureIgnoreCase))
+                vehiclesMatching[i] = vehicles[i];
+
+                if (fuelType != null && vehicles[i] != null)
+                    if(vehicles[i].Fueltype.ToString() == fuelType)
+                        vehiclesMatching[i] = vehicles[i];
+            }
+
+            //count vehicles
+            int numVehiclesFound = 0;
+            for (int i = 0;i < vehiclesMatching.Length - 1; i++)
+            {
+                if(vehiclesMatching[i] != null)
+                {
+                    numVehiclesFound++;
+                }
+            }
+            //now we know the size we need
+            displayModelArray = new VehicleDisplayModel[numVehiclesFound];
+
+            int displayModelIndex = 0;
+            for (int i = 0; i < vehiclesMatching.Length -1; i++)
+            {
+                if (vehiclesMatching[i] != null)
+                {
+                    displayModelArray[displayModelIndex] = VehicleToDisplayModel(vehiclesMatching[i]);
+                }
+            }
+            return displayModelArray;
+
+        }
+        private void ListAll()
+        {
+            int numVehiclesFound = 0;
+            Vehicle[] vehicleGarage = garage.GetAllVehiclesToArray();
+            VehicleDisplayModel[] displayModelArray;
+            for (int i = 0; i < vehicleGarage.Length - 1; i++)
+            {
+                if (vehicleGarage[i] != null)
+                {
+                    numVehiclesFound++;
+                }
+            }
+            if (numVehiclesFound > 0)
+            {
+                displayModelArray = new VehicleDisplayModel[numVehiclesFound];
+                int displayModelIndex = 0;
+                for (int i = 0; i < vehicleGarage.Length - 1; i++)
+                {
+                    if (vehicleGarage[i] != null)
+                    {
+                        displayModelArray[displayModelIndex] = VehicleToDisplayModel(vehicleGarage[i]);
+                        displayModelIndex++;
+                    }
+                }
+                View.PrintVehicles(displayModelArray);
+            }
+        }
+
+
         void Search(string? wheels = null, string? color = null, string? vehicleType = null, string? fueltype = null, string? regNumber = null)
         {
-            View.PrintVehicles(SearchForVehiclesToDisplayModel(wheels, color, vehicleType, fueltype, regNumber));
+            if (wheels == null && color == null && vehicleType == null && fueltype == null && regNumber == null)
+            {
+                ListAll();
+                return;
+            }
+            View.PrintVehicles(SearchForVehiclesToDisplayModelArrayMethod(wheels, color, vehicleType, fueltype, regNumber));
         }
 
         private void Unpark(string? regNumber)

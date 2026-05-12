@@ -54,10 +54,13 @@ namespace GaragePractice
             return garageSpace.Where(x => x != null && x.RegistryNumber == registryNumber).FirstOrDefault();
         }
 
-        public IEnumerable<Vehicle> GetAllVehicles()
+  
+        public Vehicle[] GetAllVehiclesToArray() // need to convert all IEnumerable to Array
         {
-            return garageSpace.OfType<Vehicle>();
+            return (Vehicle[])garageSpace.Clone();
         }
+
+
 
         public int TotalFreeSlots()
         {
@@ -72,17 +75,6 @@ namespace GaragePractice
         public int UsedSlotsCount()
         {
             return garageSpace.Count(x => x != null);
-        }
-
-        private void SearchVehicleSpecifics()
-        {
-            //Söka efter fordon utifrån en egenskap eller flera (alla möjliga kombinationer från
-            //basklassen Vehicle). Exempelvis:
-            //○ Alla svarta fordon med fyra hjul.
-            //○ Alla motorcyklar som är rosa och har 3 hjul.
-            //○ Alla lastbilar
-            //○ Alla röda fordon
-            //else did not find any vehicle matching the exact search
         }
 
         public void AutoPopulateGarage()

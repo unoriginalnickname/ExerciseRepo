@@ -13,17 +13,18 @@ namespace GaragePractice
             Console.WriteLine(s);
         }
 
-        public static void PrintVehicles(IEnumerable<VehicleDisplayModel> enumerable)
+        public static void PrintVehicles(VehicleDisplayModel[] displayModelArray)
         {
-            if(enumerable.Count() == 0)
+            if(displayModelArray.Length == 0)
             {
-                Console.WriteLine("Garage appears empty. ");
+                Console.WriteLine("No vehicles found. ");
             }
-            Console.WriteLine("Amount found: " + enumerable.Count());
+            Console.WriteLine("Amount found: " + displayModelArray.Length);
             //could format strings into columns
-            foreach (VehicleDisplayModel item in enumerable)
+
+            for (int i = 0; i < displayModelArray.Length; i++)
             {
-                Console.WriteLine(item.ToString());
+                Console.WriteLine(displayModelArray[i].ToString());
             }
         }
 
