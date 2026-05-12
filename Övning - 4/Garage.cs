@@ -42,8 +42,10 @@ namespace GaragePractice
                 if (garageSpace[i] != null)
                 {
                     if (garageSpace[i].RegistryNumber == regPlateNumber)
+                    {
                         garageSpace[i] = null;
-                    return true;
+                        return true;
+                    }
                 }
             }
             return false;
