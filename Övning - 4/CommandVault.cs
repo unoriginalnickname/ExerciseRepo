@@ -99,35 +99,80 @@ namespace GaragePractice
         VehicleDisplayModel[] FindVehiclesToDisplayModelArrayMethod(string? numWheels = null, string? color = null, string? vehicleType = null, string? fuelType = null, string? regNumber = null)
         {
             Vehicle[] vehicles = garage.GetAllVehiclesToArray();
-            Vehicle[] vehiclesMatching = new Vehicle[vehicles.Length];
-            VehicleDisplayModel[] displayModelArray;
+            Vehicle[] realMatch = new Vehicle[vehicles.Length];
+            Vehicle[] tempMatch = new Vehicle[vehicles.Length];
 
             //get whatever is matching
             for (int i = 0; i < vehicles.Length - 1; i++)
             {
-                if (regNumber != null && vehicles[i] != null)
-                    if (string.Equals(vehicles[i].RegistryNumber, regNumber, StringComparison.CurrentCultureIgnoreCase))
-                        vehiclesMatching[i] = vehicles[i];
+                if (vehicles[i] != null)
+                {
+                    if (regNumber != null)
+                        if (string.Equals(vehicles[i].RegistryNumber, regNumber, StringComparison.CurrentCultureIgnoreCase))
+                            tempMatch[i] = vehicles[i];
 
-                if (numWheels != null && vehicles[i] != null)
-                    if (string.Equals(vehicles[i].NumWheels, numWheels, StringComparison.CurrentCultureIgnoreCase))
-                        vehiclesMatching[i] = vehicles[i];
+                    if (numWheels != null)
+                        if (string.Equals(vehicles[i].NumWheels, numWheels, StringComparison.CurrentCultureIgnoreCase))
+                            tempMatch[i] = vehicles[i];
 
-                if (color != null && vehicles[i] != null)
-                    if (string.Equals(vehicles[i].Color, color, StringComparison.OrdinalIgnoreCase))
-                        vehiclesMatching[i] = vehicles[i];
+                    if (color != null)
+                        if (string.Equals(vehicles[i].Color, color, StringComparison.OrdinalIgnoreCase))
+                            tempMatch[i] = vehicles[i];
 
-                if (vehicleType != null && vehicles[i] != null)
-                    if (string.Equals(vehicles[i].GetType().Name, vehicleType, StringComparison.CurrentCultureIgnoreCase))
-                        vehiclesMatching[i] = vehicles[i];
+                    if (vehicleType != null)
+                        if (string.Equals(vehicles[i].GetType().Name, vehicleType, StringComparison.CurrentCultureIgnoreCase))
+                            tempMatch[i] = vehicles[i];
 
-                if (fuelType != null && vehicles[i] != null)
-                    if (vehicles[i].Fueltype.ToString() == fuelType)
-                        vehiclesMatching[i] = vehicles[i];
+                    if (fuelType != null)
+                        if (vehicles[i].Fueltype.ToString() == fuelType)
+                            tempMatch[i] = vehicles[i];
+                }
             }
-            return VehicleArrToDisplayArr(vehiclesMatching);
+            //remove what is not matching
+            for (int i = 0; i < vehicles.Length - 1; i++)
+            {
+                if (vehicles[i] != null)
+                {
+                    if (regNumber != null)
+                        if (!string.Equals(vehicles[i].RegistryNumber, regNumber, StringComparison.CurrentCultureIgnoreCase))
+                            realMatch = RemoveNonMatchingFromArray(tempMatch, i);
+
+                    if (numWheels != null)
+                        if (!string.Equals(vehicles[i].NumWheels, numWheels, StringComparison.CurrentCultureIgnoreCase))
+                            realMatch = RemoveNonMatchingFromArray(tempMatch, i);
+
+                    if (color != null)
+                        if (!string.Equals(vehicles[i].Color, color, StringComparison.OrdinalIgnoreCase))
+                            realMatch = RemoveNonMatchingFromArray(tempMatch, i);
+
+                    if (vehicleType != null)
+                        if (!string.Equals(vehicles[i].GetType().Name, vehicleType, StringComparison.CurrentCultureIgnoreCase))
+                            realMatch = RemoveNonMatchingFromArray(tempMatch, i);
+
+                    if (fuelType != null)
+                        if (vehicles[i].Fueltype.ToString() != fuelType)
+                            realMatch = RemoveNonMatchingFromArray(tempMatch, i);
+                }
+            }
+            return VehicleArrToDisplayArr(realMatch);
         }
 
+        private Vehicle[] RemoveNonMatchingFromArray(Vehicle[] tempMatch, int indexToRemove)
+        {
+            if (tempMatch.Length < 2)
+                return null;
+
+            //make new array
+            Vehicle[] finalArray = new Vehicle[tempMatch.Length - 1];
+
+            //copy contents 
+            int finalIndex = 0;
+            for (int i = 0; i < tempMatch.Length; i++)
+                if (i != indexToRemove) //except the one to remove
+                    finalArray[finalIndex++] = tempMatch[i];
+
+            return finalArray;
+        }
         private VehicleDisplayModel[] VehicleArrToDisplayArr(Vehicle[] vehiclesMatching)
         {
             VehicleDisplayModel[] displayModelArray;
