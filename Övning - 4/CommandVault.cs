@@ -12,8 +12,9 @@ namespace GaragePractice
     {
         const int garageMinSize = 15;
         Garage garage;
-               
+
         RootCommand root;
+        Command listall = new("listall", "lists all vehicles");
         Command findCommand = new("find", "Usage: find --vehicletype Motorcycle --regnum AbC-123 --color Green --wheels 2 --fuel Gasoline");
         Command unparkCommand = new("unpark", "Usage: unpark --regnum ABC-123");
         Command parkCommand = new("park", "Usage: park --regnum ABC-123 --vehicletype Motorcycle --color Green --wheels 2 --fuel Element155");
@@ -21,10 +22,10 @@ namespace GaragePractice
 
 
         Option<string> registryNumberOption = new Option<string>("--regnum") { HelpName = "platenumber", Required = false };
-        Option<string> wheelsOption = new("--wheels") {  HelpName = "Amount", Required = false }; //future implementations
-        Option<string> colorOption = new("--color") {  HelpName = "Color", Required = false };         //list all the valid color options
-        Option<string> vehicleTypeOption = new("--vehicletype") {  HelpName ="Vehicletype", Required = false };    //list all the vehicle options
-        Option<string> fuelTypeOption = new("--fuel") { HelpName = "Fuel type", Required = false };    
+        Option<string> wheelsOption = new("--wheels") { HelpName = "Amount", Required = false }; //future implementations
+        Option<string> colorOption = new("--color") { HelpName = "Color", Required = false };         //list all the valid color options
+        Option<string> vehicleTypeOption = new("--vehicletype") { HelpName = "Vehicletype", Required = false };    //list all the vehicle options
+        Option<string> fuelTypeOption = new("--fuel") { HelpName = "Fuel type", Required = false };
 
 
         Option<string> parkRegistryNumberOption = new Option<string>("--regnum") { HelpName = "platenumber", Required = true };
@@ -46,11 +47,13 @@ namespace GaragePractice
             parkCommand.Add(parkRegistryNumberOption); parkCommand.Add(parkVehicleType); parkCommand.Add(parkFuelType); parkCommand.Add(parkColorOption); parkCommand.Add(parkWheelsOption);
 
             findCommand.Add(registryNumberOption); findCommand.Add(vehicleTypeOption); findCommand.Add(wheelsOption); findCommand.Add(colorOption); findCommand.Add(fuelTypeOption);
-            
+
             unparkCommand.Add(parkRegistryNumberOption);
 
             unparkCommand.SetAction(p => Unpark(p.GetValue(parkRegistryNumberOption)));
 
+
+            listall.SetAction(_ => ListAll());
             findCommand.SetAction(p => Find(p.GetValue(wheelsOption), p.GetValue(colorOption), p.GetValue(vehicleTypeOption), p.GetValue(fuelTypeOption), p.GetValue(registryNumberOption)));
 
             parkCommand.SetAction(p => Park(p.GetValue(parkWheelsOption), p.GetValue(parkColorOption), p.GetValue(parkVehicleType), p.GetValue(parkFuelType), p.GetValue(parkRegistryNumberOption)));
@@ -58,6 +61,7 @@ namespace GaragePractice
             exitCommand.SetAction(p => run = false);
 
             //add the commands to the root command
+            root.Add(listall);
             root.Add(findCommand);
             root.Add(unparkCommand);
             root.Add(parkCommand);
@@ -151,18 +155,16 @@ namespace GaragePractice
 
         private void ListAll()
         {
-                View.PrintVehicles(VehicleArrToDisplayArr(garage.GetAllVehiclesToArray()));
+            View.PrintVehicles(VehicleArrToDisplayArr(garage.GetAllVehiclesToArray()));
         }
 
 
         void Find(string? wheels = null, string? color = null, string? vehicleType = null, string? fueltype = null, string? regNumber = null)
         {
             if (wheels == null && color == null && vehicleType == null && fueltype == null && regNumber == null)
-            {
-                ListAll();
-                return;
-            }
-            View.PrintVehicles(FindVehiclesToDisplayModelArrayMethod(wheels, color, vehicleType, fueltype, regNumber));
+                root.Parse("find --help").Invoke();
+            else
+                View.PrintVehicles(FindVehiclesToDisplayModelArrayMethod(wheels, color, vehicleType, fueltype, regNumber));
         }
 
         private void Unpark(string? regNumber)
