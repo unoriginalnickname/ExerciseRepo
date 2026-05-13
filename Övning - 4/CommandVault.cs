@@ -1,10 +1,4 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.Reflection.Metadata;
-using System.Text;
+﻿using System.CommandLine;
 
 namespace GaragePractice
 {
@@ -15,31 +9,37 @@ namespace GaragePractice
 
         RootCommand root;
         Command listall = new("listall", "Lists all vehicles");
-        Command findCommand = new("find", "Usage: find --vehicletype Motorcycle --regnum AbC-123 --color Green --wheels 2 --fuel Gasoline");
-        Command unparkCommand = new("unpark", "Usage: unpark --regnum ABC-123");
-        Command parkCommand = new("park", "Usage: park --regnum ABC-123 --vehicletype Motorcycle --color Green --wheels 2 --fuel Element155");
+        Command findCommand = new("find", "--vehicletype --regnum --color --wheels --fuel");
+        
+        Command unparkCommand = new("unpark", "--regnum");
+        Command parkCommand = new("park", "--regnum --vehicletype --color --wheels --fuel (ALL REQUIRED) ");
         Command exitCommand = new("exit");
 
 
         Option<string> registryNumberOption = new Option<string>("--regnum") { HelpName = "platenumber", Required = false };
-        Option<string> wheelsOption = new("--wheels") { HelpName = "Amount", Required = false }; //future implementations
-        Option<string> colorOption = new("--color") { HelpName = "Color", Required = false };         //list all the valid color options
-        Option<string> vehicleTypeOption = new("--vehicletype") { HelpName = "Vehicletype", Required = false };    //list all the vehicle options
+        Option<string> wheelsOption = new("--wheels") { HelpName = "Amount", Required = false }; //future implementations: list all the valid color, vehicle options
+        Option<string> colorOption = new("--color") { HelpName = "Color", Required = false };       
+        Option<string> vehicleTypeOption = new("--vehicletype") { HelpName = "Vehicletype", Required = false }; 
         Option<string> fuelTypeOption = new("--fuel") { HelpName = "Fuel type", Required = false };
 
 
         Option<string> parkRegistryNumberOption = new Option<string>("--regnum") { HelpName = "platenumber", Required = true };
         Option<string> parkWheelsOption = new("--wheels") { HelpName = "Amount", Required = true };
-        Option<string> parkColorOption = new("--color") { HelpName = "Color", Required = true };        //make sure to list all the valid color options
-        Option<string> parkVehicleType = new("--vehicletype") { HelpName = "Vehicletype", Required = true };    //make sure to list all the vehicle options
-        Option<string> parkFuelType = new("--fuel") { HelpName = "Fuel type", Required = true };    //make sure to list all the vehicle options
+        Option<string> parkColorOption = new("--color") { HelpName = "Color", Required = true };       
+        Option<string> parkVehicleType = new("--vehicletype") { HelpName = "Vehicletype", Required = true };  
+        Option<string> parkFuelType = new("--fuel") { HelpName = "Fuel type", Required = true };
 
+  
+    
 
         public CommandVault()
         {
-            root = new RootCommand("Garage");
+            root = new RootCommand("Usage examples:" +
+                "\nfind --vehicletype Motorcycle --color pink" +
+                "\nunpark --regnum ABC-123");
             InitializeCommands();
             SetupMenu();
+           
         }
 
         void InitializeCommands()
@@ -149,7 +149,6 @@ namespace GaragePractice
                     displayModelIndex++;
                 }
             }
-
             return displayModelArray;
         }
 
