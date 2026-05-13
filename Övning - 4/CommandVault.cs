@@ -9,10 +9,12 @@ namespace GaragePractice
 
         RootCommand root;
         Command listall = new("listall", "Lists all vehicles");
-        Command findCommand = new("find", "--vehicletype --regnum --color --wheels --fuel");
-        
-        Command unparkCommand = new("unpark", "--regnum");
-        Command parkCommand = new("park", "--regnum --vehicletype --color --wheels --fuel (ALL REQUIRED) ");
+        Command findCommand = new("find", "--vehicletype --regnum --color --wheels --fuel" +
+            "\nexample: find --fuel Gas --vehicletype Car");
+        Command unparkCommand = new("unpark", "--regnum" +
+            "\n example: unpark --regnum 123-ABC");
+        Command parkCommand = new("park", "--regnum --vehicletype --color --wheels --fuel (ALL REQUIRED)" +
+            "\n example: park --regnum 123-ABC --vehicletype car --color Red --wheels 2 --fuel Gas");
         Command exitCommand = new("exit");
 
 
