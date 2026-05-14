@@ -17,8 +17,6 @@ namespace GaragePractice
     { "Uap",         "Classified"             },
         };
 
-
-
         public string[,] ApprovedVehicleTypes { get { return vehicleTypes; } }
 
         private IVehicle[] vehicleGarageArray;
@@ -54,11 +52,11 @@ namespace GaragePractice
             for (int i = 0; i < vehicleGarageArray.Length; i++)
             {
                 if (vehicleGarageArray[i] != null)
-                    if (vehicleGarageArray[i].RegistryNumber == regPlateNumber);
-                    {
-                        vehicleGarageArray[i] = null;
-                        return true;
-                    }
+                    if (vehicleGarageArray[i].RegistryNumber == regPlateNumber) ;
+                {
+                    vehicleGarageArray[i] = null;
+                    return true;
+                }
             }
             return false;
         }
@@ -92,17 +90,13 @@ namespace GaragePractice
                 string vehicleType = ApprovedVehicleTypes[i, 0];
 
                 IVehicle vehicle = (IVehicle?)Activator.CreateInstance(Type.GetType("GaragePractice." + vehicleType));
-                
+
                 vehicle.RegistryNumber = "123-ABC";
                 vehicle.Color = "Blue";
                 vehicle.Fueltype = "Gas";
                 vehicle.NumWheels = "2";
                 vehicle.UniqueProperty = "test";
-
-
                 vehicleGarageArray[i] = vehicle;
-           
-            
             }
         }
 
