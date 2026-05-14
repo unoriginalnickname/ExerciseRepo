@@ -1,26 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace GaragePractice
+﻿namespace GaragePractice
 {
-    public abstract class Vehicle
+    public interface IVehicle
     {
         public string RegistryNumber { get; set; }
         public string Color { get; set; }
         public string NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public string Other { get; set; }
-        public abstract void SetUniqueProperty(string property);
-        public abstract string GetUniquePropertyString();
-        public abstract string GetUniqueProperty();
-        public Vehicle(string regPlate = "", string color = "", string numWheels = "", string fuel = "", string other = "")
-        {
-            RegistryNumber = regPlate;
-            Color = color;
-            NumWheels = numWheels;
-            Fueltype = fuel;
-            Other = other;
-        }
+        public string UniqueProperty { get; set; }
+        public string UniquePropertyString { get; set; }
     }
 }

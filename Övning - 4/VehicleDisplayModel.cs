@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace GaragePractice
+﻿namespace GaragePractice
 {
     public class VehicleDisplayModel
     {

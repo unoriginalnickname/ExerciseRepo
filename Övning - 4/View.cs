@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace GaragePractice
+﻿namespace GaragePractice
 {
 
     public static class View
@@ -13,9 +9,9 @@ namespace GaragePractice
             Console.WriteLine(s);
         }
 
-        public static void PrintVehicles(VehicleDisplayModel[] displayModelArray)
+        public static void PrintVehicles(VehicleDisplayModel[]? displayModelArray)
         {
-            if(displayModelArray.Length == 0)
+            if (displayModelArray == null)
             {
                 Console.WriteLine("No vehicles found. ");
             }
@@ -32,7 +28,7 @@ namespace GaragePractice
         {
             return Console.ReadLine();
         }
-        
+
         internal static void Clear()
         {
             Console.Clear();

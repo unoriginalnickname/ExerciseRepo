@@ -1,76 +1,130 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.VisualBasic.FileIO;
+using static System.Net.WebRequestMethods;
 
 namespace GaragePractice
 {
     public class Garage
     {
-        private Vehicle[] garageSpace;
+
+        private readonly string[,] vehicleTypes = new string[,]
+        {
+    { "Airplane",    "Wing span (m)"         },
+    { "Boat",        "Hull length (m)"        },
+    { "Bus",         "Number of stops"        },
+    { "Car",         "Number of doors"        },
+    { "Motorcycle",  "Engine size (cc)"       },
+    { "Ufo",         "Abduction capacity"     },
+    { "Uap",         "Classified"             },
+        };
+
+
+
+        public string[,] ApprovedVehicleTypes { get { return vehicleTypes; } }
+
+        private IVehicle[] vehicleGarageArray;
         private readonly int defaultSize = 15;
 
         public Garage()
         {
             Console.WriteLine("Garage: creating garage with default size " + defaultSize);
-            garageSpace = new Vehicle[defaultSize];
+            vehicleGarageArray = new IVehicle[defaultSize];
         }
 
         public Garage(int garageSize)
         {
-            garageSpace = new Vehicle[garageSize];
+            vehicleGarageArray = new IVehicle[garageSize];
         }
-        
-        public void ParkVehicle(Vehicle vehicle) 
+
+        public void ParkVehicle(IVehicle vehicle)
         {
             if (FindFirstFreeParkingSlot() is int parkingSlot) //fancy syntax
-                garageSpace[parkingSlot] = vehicle;
+                vehicleGarageArray[parkingSlot] = vehicle;
         }
 
         private int? FindFirstFreeParkingSlot()
         {
-            for (int i = 0; i < garageSpace.Length; i++)
-                if (garageSpace[i] == null)
+            for (int i = 0; i < vehicleGarageArray.Length; i++)
+                if (vehicleGarageArray[i] == null)
                     return i;
             return null;
         }
 
         public bool UnParkVehicle(string? regPlateNumber)
         {
-            for (int i = 0; i < garageSpace.Length; i++)
+            for (int i = 0; i < vehicleGarageArray.Length; i++)
             {
-                if (garageSpace[i] != null)
-                    if (garageSpace[i].RegistryNumber == regPlateNumber)
+                if (vehicleGarageArray[i] != null)
+                    if (vehicleGarageArray[i].RegistryNumber == regPlateNumber);
                     {
-                        garageSpace[i] = null;
+                        vehicleGarageArray[i] = null;
                         return true;
                     }
             }
             return false;
         }
 
-        public Vehicle[] GetAllVehiclesToArray() 
+        public IVehicle[] GetVehicleArray()
         {
-            return (Vehicle[])garageSpace.Clone();
+            return (IVehicle[])vehicleGarageArray.Clone();
+        }
+
+        public int GetNumberOfVehiclesInGarage()
+        {
+            return NumberOfVehiclesInArray(this.vehicleGarageArray);
+        }
+        private int NumberOfVehiclesInArray(IVehicle[] arr)
+        {
+            int numberOfVehicles = 0;
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (arr[i] != null) numberOfVehicles++;
+            }
+            return numberOfVehicles;
         }
 
         public void AutoPopulateGarage()
         {
             Console.WriteLine("Garage: Autopopulating...");
             //garageSpace[0] = new Airplane("123", "green", "8", FuelType.ZeroPointModule, "nothing");
-            garageSpace[1] = new Boat("123-ABC", "blue", "2", "Gas", "nothing");
-            garageSpace[2] = new Car("456-DEF", "yellow", "4", "Diesel", "nothing");
-            garageSpace[3] = new Airplane("789-GHI", "black", "4", "Anti-gravity", "nothing");
-            garageSpace[4] = new Car("ABC-393", "black", "4", "Gasoline", "nothing");
-            garageSpace[5] = new Bus("ABC-999", "black", "4", "Gasoline", "nothing");
-            garageSpace[6] = new Motorcycle("ABC-234", "pink", "3", "Gasoline", "nothing");
-            garageSpace[7] = new Motorcycle("qqq-728", "pink", "3", "ZeroPointEnergy", "nothing");
-            garageSpace[8] = new Motorcycle("ZZZ-562", "pink", "3", "Diesel", "nothing");
-            garageSpace[9] = new Motorcycle("ZZZ-123", "black", "3", "Diesel", "nothing");
+
+            for (int i = 0; i < ApprovedVehicleTypes.GetLength(0); i++)
+            {
+                string vehicleType = ApprovedVehicleTypes[i, 0];
+
+                IVehicle vehicle = (IVehicle?)Activator.CreateInstance(Type.GetType("GaragePractice." + vehicleType));
+                
+                vehicle.RegistryNumber = "123-ABC";
+                vehicle.Color = "Blue";
+                vehicle.Fueltype = "Gas";
+                vehicle.NumWheels = "2";
+                vehicle.UniqueProperty = "test";
+
+
+                vehicleGarageArray[i] = vehicle;
+           
+            
+            }
         }
 
-        public Vehicle[] GetGarageContents()
+        public IVehicle[] GetGarageContents()
         {
-            return garageSpace;
+            return vehicleGarageArray;
+        }
+
+        internal bool VehicleIsApprovedType(string vehicleType)
+        {
+            int length = ApprovedVehicleTypes.Length;
+
+            for (int i = 0; i < length; i++)
+            {
+                if (ApprovedVehicleTypes[i, 0] == vehicleType)
+                {
+                    Console.WriteLine("Vehicletype is approved. ");
+                    return true;
+                }
+            }
+            Console.WriteLine("Vehicletype failed approval. ");
+            return false;
         }
     }
 }
