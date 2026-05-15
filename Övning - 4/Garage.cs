@@ -1,13 +1,16 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using static System.Net.WebRequestMethods;
+using System.Linq;
+using System.Security.Cryptography;
 
 namespace GaragePractice
 {
     public class Garage
     {
-
-        private readonly string[,] vehicleTypes = new string[,]
-        {
+        
+      
+        Dictionary<string, string> approvedVehicleTypes = new Dictionary<string, string>()
+ {
     { "Airplane",    "Wing span (m)"         },
     { "Boat",        "Hull length (m)"        },
     { "Bus",         "Number of stops"        },
@@ -15,9 +18,20 @@ namespace GaragePractice
     { "Motorcycle",  "Engine size (cc)"       },
     { "Ufo",         "Abduction capacity"     },
     { "Uap",         "Classified"             },
-        };
+ };
 
-        public string[,] ApprovedVehicleTypes { get { return vehicleTypes; } }
+        //    private readonly string[,] vehicleTypes = new string[,]
+        //    {
+        //{ "Airplane",    "Wing span (m)"         },
+        //{ "Boat",        "Hull length (m)"        },
+        //{ "Bus",         "Number of stops"        },
+        //{ "Car",         "Number of doors"        },
+        //{ "Motorcycle",  "Engine size (cc)"       },
+        //{ "Ufo",         "Abduction capacity"     },
+        //{ "Uap",         "Classified"             },
+        //    };
+
+        public Dictionary<string, string> ApprovedVehicleTypes { get { return approvedVehicleTypes; } }
 
         private IVehicle[] vehicleGarageArray;
         private readonly int defaultSize = 15;
@@ -85,9 +99,11 @@ namespace GaragePractice
             Console.WriteLine("Garage: Autopopulating...");
             //garageSpace[0] = new Airplane("123", "green", "8", FuelType.ZeroPointModule, "nothing");
 
-            for (int i = 0; i < ApprovedVehicleTypes.GetLength(0); i++)
+            var keys = ApprovedVehicleTypes.Keys.ToList();
+
+            for (int i = 0; i < keys.Count; i++)
             {
-                string vehicleType = ApprovedVehicleTypes[i, 0];
+                string vehicleType = keys[i];
 
                 IVehicle vehicle = (IVehicle?)Activator.CreateInstance(Type.GetType("GaragePractice." + vehicleType));
 
@@ -107,11 +123,12 @@ namespace GaragePractice
 
         internal bool VehicleIsApprovedType(string vehicleType)
         {
-            int length = ApprovedVehicleTypes.Length;
+            int length = ApprovedVehicleTypes.Keys.Count;
+            var keys = ApprovedVehicleTypes.Keys.ToList();
 
             for (int i = 0; i < length; i++)
             {
-                if (ApprovedVehicleTypes[i, 0] == vehicleType)
+                if (keys[i] == vehicleType)
                 {
                     Console.WriteLine("Vehicletype is approved. ");
                     return true;

@@ -49,7 +49,6 @@ namespace Övning___4
                 vehicle.UniqueProperty = filter.UniqueProperty!;
                 garage.ParkVehicle(vehicle);
                 View.PrintString("Parked. ");
-                return;
             }
         }
 
@@ -198,15 +197,16 @@ namespace Övning___4
         internal void ListApprovedVehicleTypes()
         {
             StringBuilder sb = new StringBuilder();
-            string[,] approved = garage.ApprovedVehicleTypes;
+            var approved = garage.ApprovedVehicleTypes.Keys.ToList();
+            var unique = garage.ApprovedVehicleTypes.Values.ToList();
 
             sb.Append("\nApproved vehicletypes: \n\n");
-            for (int i = 0; i < approved.GetLength(0); i++)
+            for (int i = 0; i < approved.Count; i++)
             {
-                if (i != approved.Length - 1)
-                    sb.Append($"{approved[i, 0]}, unique: {approved[i, 1]}. \n");
+                if (i != approved.Count - 1)
+                    sb.Append($"{approved[i]}, unique: {unique[i]}. \n");
                 else
-                    sb.Append($"{approved[i, 0]}, unique: {approved[i, 1]}. ");
+                    sb.Append($"{approved[i]}, unique: {unique[i]}. ");
             }
             View.PrintString(sb.ToString());
         }
