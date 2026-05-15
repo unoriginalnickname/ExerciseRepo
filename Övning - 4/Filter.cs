@@ -1,4 +1,6 @@
-﻿namespace GaragePractice
+﻿using Microsoft.VisualBasic.FileIO;
+
+namespace GaragePractice
 {
     public struct Filter
     {
@@ -8,5 +10,9 @@
         public string? RegNumber { get; set { if (value != null) field = value.ToUpper(); } }
         public string? NumWheels { get; set; }
         public string? UniqueProperty { get; set; }
+        public override string ToString()
+        {
+            return $"Type {VehicleType}, Reg: {RegNumber}, Color: {Color}, # wheels: {NumWheels}, fueltype: {FuelType}, unique: {UniqueProperty}";
+        }
     }
 }

@@ -61,7 +61,7 @@ namespace GaragePractice
             return false;
         }
 
-        public IVehicle[] GetVehicleArray()
+        public IVehicle[] GetIVehicleArray()
         {
             return (IVehicle[])vehicleGarageArray.Clone();
         }

@@ -9,7 +9,7 @@
             Console.WriteLine(s);
         }
 
-        public static void PrintVehicles(VehicleDisplayModel[]? displayModelArray)
+        public static void PrintVehicles(Filter[]? displayModelArray)
         {
             if (displayModelArray == null)
             {

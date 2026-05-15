@@ -11,7 +11,8 @@ namespace Övning___4
         public CommandLogic(RootCommand root)
         {
             this.root = root;
-            this.garage = SetupGarage();
+            this.garage = new Garage(SetupGarageSize());
+            SetupAutoPopulate(garage);
         }
 
         bool run = true;
@@ -54,7 +55,7 @@ namespace Övning___4
 
         bool DoesRegisterNumberExist(string? regNumber)
         {
-            IVehicle[] temp = garage.GetVehicleArray();
+            IVehicle[] temp = garage.GetIVehicleArray();
 
             if (FilterVehicles
                 (temp, new Filter() { RegNumber = regNumber }).Length == 0)
@@ -66,11 +67,8 @@ namespace Övning___4
 
         public void Find(Filter filter)
         {
-            IVehicle[] vehiclesInGarage = garage.GetVehicleArray();
-
-            IVehicle[] filteredVehicles = FilterVehicles(vehiclesInGarage, filter);
-
-            View.PrintVehicles(VehicleArrToDisplayArr(filteredVehicles));
+            IVehicle[] filteredVehicles = FilterVehicles(garage.GetIVehicleArray(), filter);
+            View.PrintVehicles(ConvertVehiclesToFilterArray(filteredVehicles));
         }
         bool Matches(IVehicle vehicle, Filter filter)
         {
@@ -127,16 +125,16 @@ namespace Övning___4
             }
             return result;
         }
-        private VehicleDisplayModel[]? VehicleArrToDisplayArr(IVehicle[]? arr)
+        private Filter[]? ConvertVehiclesToFilterArray(IVehicle[]? arr)
         {
             if (arr != null)
             {
-                VehicleDisplayModel[] displayModelArray = new VehicleDisplayModel[arr.Length];
+                Filter[] displayModelArray = new Filter[arr.Length];
 
                 int displayModelIndex = 0;
                 for (int i = 0; i < arr.Length; i++)
                 {
-                    displayModelArray[displayModelIndex] = VehicleToDisplayModel(arr[i]);
+                    displayModelArray[displayModelIndex] = ConvertVehicleToDisplay(arr[i]);
                     displayModelIndex++;
                 }
                 return displayModelArray;
@@ -145,7 +143,7 @@ namespace Övning___4
         }
         public void ListAll()
         {
-            View.PrintVehicles(VehicleArrToDisplayArr(RemoveNullFromVehicleArray(garage.GetVehicleArray())));
+            View.PrintVehicles(ConvertVehiclesToFilterArray(RemoveNullFromVehicleArray(garage.GetIVehicleArray())));
         }
 
         public void Unpark(string? regNumber)
@@ -156,19 +154,8 @@ namespace Övning___4
             }
         }
 
-        Garage SetupGarage()
+        void SetupAutoPopulate(Garage garage)
         {
-            Garage garage;
-            int garageSize;
-
-            View.PrintString($"Garage setup, enter garage size(max 100), or press enter for default size 15");
-
-            bool parseSuccessful = int.TryParse(View.GetInput(), out garageSize);
-            if (parseSuccessful)
-                garage = new(Math.Max(Math.Min(garageSize, 100), 15));
-            else
-                garage = new();
-
             View.PrintString("\nAutopopulate garage with vehicles? Y/N");
             string input = View.GetInput();
 
@@ -178,22 +165,29 @@ namespace Övning___4
                 garage.AutoPopulateGarage();
                 View.PrintString("\nGarage is now autopopulated.\n");
             }
-
-            return garage;
+        }
+        int SetupGarageSize()
+        {
+            int garageSize;
+            View.PrintString($"Garage setup, enter garage size(max 100), or press enter for default size 15");
+            bool parseSuccessful = int.TryParse(View.GetInput(), out garageSize);
+            if (parseSuccessful)
+                return (Math.Max(Math.Min(garageSize, 100), 15));
+            else return 15;
         }
 
-        private VehicleDisplayModel VehicleToDisplayModel(IVehicle vehicle)
+        private Filter ConvertVehicleToDisplay(IVehicle vehicle)
         {
-            VehicleDisplayModel model = new VehicleDisplayModel
+            Filter filter = new Filter
             {
                 VehicleType = vehicle.GetType().Name,
-                RegPlateNumber = vehicle.RegistryNumber,
+                RegNumber = vehicle.RegistryNumber,
                 Color = vehicle.Color,
                 NumWheels = vehicle.NumWheels,
-                Fueltype = vehicle.Fueltype,
-                UniqueProperties = vehicle.UniqueProperty
+                FuelType = vehicle.Fueltype,
+                UniqueProperty = vehicle.UniqueProperty
             };
-            return model;
+            return filter;
         }
 
         internal void Exit()
