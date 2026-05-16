@@ -13,8 +13,6 @@ namespace GaragePractice
         public string Fueltype { get; set; }
         public string UniqueProperty { get; set; }
         public string UniquePropertyString { get { return "Number of engines: ";  } set; }
-
-        public int NumEngines { get; set; }
     }
     public class Motorcycle : IVehicle
     {
@@ -31,7 +29,6 @@ namespace GaragePractice
         public string Color { get; set; }
         public string NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public int NumberOfSeats { get; set; }
         public string UniqueProperty { get; set; }
         public string UniquePropertyString { get { return "Number of seats: "; } set; }
     }
@@ -42,8 +39,6 @@ namespace GaragePractice
         public string Color { get; set; }
         public string NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public string Other { get; set; }
-        public int NumberOfSeats { get; set; }
         public string UniqueProperty { get; set; }
         public string UniquePropertyString { get; set; }
     }
@@ -53,7 +48,6 @@ namespace GaragePractice
         public string Color { get; set; }
         public string NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public int NumberOfSeats { get; set; }
         public string UniqueProperty { get; set; }
         public string UniquePropertyString { get { return "Number of seats: ";  } set; }
     }
@@ -63,19 +57,15 @@ namespace GaragePractice
         public string Color { get; set; }
         public string NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public string Other { get; set; }
-        public string AntiGravityEngine { get; set; }
         public string UniqueProperty { get; set; }
         public string UniquePropertyString { get { return "Anti gravity engine type: "; } set; }
     }
     public class Uap : IVehicle
     {
-        public int AntiGravityEngine { get; set; }
         public string RegistryNumber { get; set; }
         public string Color { get; set; }
         public string NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public string Other { get; set; }
         public string UniqueProperty { get; set; }
         public string UniquePropertyString { get { return "Anti gravity engine type: "; } set; }
     }
