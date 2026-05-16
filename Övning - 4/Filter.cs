@@ -4,15 +4,31 @@ namespace GaragePractice
 {
     public struct Filter
     {
-        public string? VehicleType {  get; set { if(value != null) field = char.ToUpper(value[0]) + value.Substring(1).ToLower(); } }
+        public bool IsValidForPark()
+        {
+            return
+                !string.IsNullOrWhiteSpace(RegNumber) &&
+                RegNumber.All(char.IsLetterOrDigit) &&
+                !string.IsNullOrWhiteSpace(VehicleType) &&
+                VehicleType.All(char.IsLetter) &&
+                NumWheels is >= 0 and <= 18;
+        }
+        public string? VehicleType { get; set; }
         public string? FuelType { get; set; }
         public string? Color { get; set; }
-        public string? RegNumber { get; set { if (value != null) field = value.ToUpper(); } }
-        public string? NumWheels { get; set; }
-        public string? UniqueProperty { get; set; }
+        public string? RegNumber { get; set; }
+        public int? NumWheels { get; set; }
+        public string? UniquePropertyString { get; set; }
+        public string? UniquePropertyValue { get; set; }
         public override string ToString()
         {
-            return $"Type {VehicleType}, Reg: {RegNumber}, Color: {Color}, # wheels: {NumWheels}, fueltype: {FuelType}, unique: {UniqueProperty}";
+            return
+                $"{VehicleType,-13}" +
+                $"{RegNumber,-10}" +
+                $"{Color,-8}" +
+                $"{NumWheels,-6}" +
+                $"{FuelType,-10}" +
+                $"{UniquePropertyString}: {UniquePropertyValue}";
         }
     }
 }

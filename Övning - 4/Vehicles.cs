@@ -9,64 +9,64 @@ namespace GaragePractice
     {
         public string RegistryNumber { get; set; }
         public string Color { get; set; }
-        public string NumWheels { get; set; }
+        public int NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public string UniqueProperty { get; set; }
-        public string UniquePropertyString { get { return "Number of engines: ";  } set; }
+        public string UniquePropertyValue { get; set; }
+        public string UniquePropertyString { get; set; }
     }
     public class Motorcycle : IVehicle
     {
         public string RegistryNumber { get; set; }
         public string Color { get; set; }
-        public string NumWheels { get; set; }
+        public int NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public string UniqueProperty { get; set; }
-        public string UniquePropertyString { get { return "Cylinder volume: "; } set; }
+        public string UniquePropertyValue { get; set; }
+        public string UniquePropertyString { get; set; }
     }
     public class Car : IVehicle
     {
         public string RegistryNumber { get; set; }
         public string Color { get; set; }
-        public string NumWheels { get; set; }
+        public int NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public string UniqueProperty { get; set; }
-        public string UniquePropertyString { get { return "Number of seats: "; } set; }
+        public string UniquePropertyValue { get; set; }
+        public string UniquePropertyString { get; set; }
     }
 
     public class Bus : IVehicle
     {
         public string RegistryNumber { get; set; }
         public string Color { get; set; }
-        public string NumWheels { get; set; }
+        public int NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public string UniqueProperty { get; set; }
+        public string UniquePropertyValue { get; set; }
         public string UniquePropertyString { get; set; }
     }
     public class Boat : IVehicle
     {
         public string RegistryNumber { get; set; }
         public string Color { get; set; }
-        public string NumWheels { get; set; }
+        public int NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public string UniqueProperty { get; set; }
-        public string UniquePropertyString { get { return "Number of seats: ";  } set; }
+        public string UniquePropertyValue { get; set; }
+        public string UniquePropertyString { get; set; }
     }
     public class Ufo : IVehicle
     {
         public string RegistryNumber { get; set; }
         public string Color { get; set; }
-        public string NumWheels { get; set; }
+        public int NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public string UniqueProperty { get; set; }
-        public string UniquePropertyString { get { return "Anti gravity engine type: "; } set; }
+        public string UniquePropertyValue { get; set; }
+        public string UniquePropertyString { get; set; }
     }
     public class Uap : IVehicle
     {
         public string RegistryNumber { get; set; }
         public string Color { get; set; }
-        public string NumWheels { get; set; }
+        public int NumWheels { get; set; }
         public string Fueltype { get; set; }
-        public string UniqueProperty { get; set; }
-        public string UniquePropertyString { get { return "Anti gravity engine type: "; } set; }
+        public string UniquePropertyValue { get; set; }
+        public string UniquePropertyString { get; set; }
     }
 }

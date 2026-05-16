@@ -1,5 +1,6 @@
 ﻿using Övning___4;
 using System.CommandLine;
+using static System.Net.WebRequestMethods;
 
 namespace GaragePractice
 {
@@ -28,13 +29,15 @@ namespace GaragePractice
 
 
         Option<string> registryNumberOption = new Option<string>("--regnum") { HelpName = "platenumber", Required = false };
-        Option<string> wheelsOption = new("--wheels") { HelpName = "Amount", Required = false }; //future implementations: list all the valid color, vehicle options
+        Option<int> wheelsOption = new("--wheels") { HelpName = "Amount", Required = false }; //future implementations: list all the valid color, vehicle options
         Option<string> colorOption = new("--color") { HelpName = "Color", Required = false };
         Option<string> vehicleTypeOption = new("--vehicletype") { HelpName = "Vehicletype", Required = false };
         Option<string> fuelTypeOption = new("--fuel") { HelpName = "Fuel type", Required = false };
+        Option<string> uniqueOption = new("--unique") { HelpName = "Unique property", Required = false };
+
 
         Option<string> parkRegistryNumberOption = new Option<string>("--regnum") { HelpName = "platenumber", Required = true };
-        Option<string> parkWheelsOption = new("--wheels") { HelpName = "Amount", Required = true };
+        Option<int> parkWheelsOption = new("--wheels") { HelpName = "Amount", Required = true };
         Option<string> parkColorOption = new("--color") { HelpName = "Color", Required = true };
         Option<string> parkVehicleType = new("--vehicletype") { HelpName = "Vehicletype", Required = true };
         Option<string> parkFuelType = new("--fuel") { HelpName = "Fuel type", Required = true };
@@ -46,25 +49,75 @@ namespace GaragePractice
             listApprovedVehicleTypes.SetAction(_ => logic.ListApprovedVehicleTypes());
 
             parkCommand.Add(parkRegistryNumberOption); parkCommand.Add(parkVehicleType); parkCommand.Add(parkFuelType); parkCommand.Add(parkColorOption); parkCommand.Add(parkWheelsOption); parkCommand.Add(parkUniqueProperty);
-            parkCommand.SetAction(p => logic.Park(new Filter()
+            parkCommand.SetAction(p =>
             {
-                NumWheels = p.GetValue(parkWheelsOption),
-                Color = p.GetValue(parkColorOption),
-                FuelType = p.GetValue(parkFuelType),
-                RegNumber = p.GetValue(parkRegistryNumberOption),
-                VehicleType = p.GetValue(parkVehicleType),
-                UniqueProperty = p.GetValue(parkUniqueProperty)
-            }));
+                string? reg = p.GetValue(parkRegistryNumberOption);
+                string? type = p.GetValue(parkVehicleType);
+                string? fuel = p.GetValue(parkFuelType);
+                string? color = p.GetValue(parkColorOption);
+                string? unique = p.GetValue(parkUniqueProperty);
+                int? wheels = p.GetValue(parkWheelsOption);
 
-            findCommand.Add(registryNumberOption); findCommand.Add(vehicleTypeOption); findCommand.Add(wheelsOption); findCommand.Add(colorOption); findCommand.Add(fuelTypeOption);
-            findCommand.SetAction(p => logic.Find(new Filter()
+                var filter = new Filter
+                {
+                    NumWheels = wheels,
+                    Color = color,
+                    FuelType = fuel,
+                    RegNumber = reg,
+                    VehicleType = type,
+                    UniquePropertyValue = unique
+                };
+
+                if (!FilterValidator.ValidateForPark(filter))
+                {
+                    Console.WriteLine("Invalid vehicle data for parking.");
+                    return;
+                }
+
+                filter.Color = Normalize(filter.Color);
+                filter.VehicleType = Normalize(filter.VehicleType);
+                filter.RegNumber = NormalizeReg(filter.RegNumber);
+                filter.FuelType = Normalize(filter.FuelType);
+
+                logic.Park(filter);
+            });
+
+            findCommand.Add(registryNumberOption); findCommand.Add(vehicleTypeOption); findCommand.Add(wheelsOption); findCommand.Add(colorOption); findCommand.Add(fuelTypeOption); findCommand.Add(uniqueOption);
+
+            findCommand.SetAction(p =>
             {
-                NumWheels = p.GetValue(wheelsOption),
-                Color = p.GetValue(colorOption),
-                VehicleType = p.GetValue(vehicleTypeOption),
-                FuelType = p.GetValue(fuelTypeOption),
-                RegNumber = p.GetValue(registryNumberOption)
-            }));
+                string? reg = p.GetValue(registryNumberOption);
+                string? type = p.GetValue(vehicleTypeOption);
+                string? fuel = p.GetValue(fuelTypeOption);
+                string? color = p.GetValue(colorOption);
+                string? unique = p.GetValue(uniqueOption);
+                int? wheels = p.GetValue(wheelsOption);
+
+                var filter = new Filter
+                {
+                    NumWheels = wheels,
+                    Color = color,
+                    FuelType = fuel,
+                    RegNumber = reg,
+                    VehicleType = type,
+                    UniquePropertyValue = unique
+                };
+
+                if (!FilterValidator.ValidateForFind(filter))
+                {
+                    Console.WriteLine("Invalid vehicle data for search.");
+                    return;
+                }
+
+                filter.Color = Normalize(filter.Color);
+                filter.VehicleType = Normalize(filter.VehicleType);
+                filter.RegNumber = NormalizeReg(filter.RegNumber);
+                filter.FuelType = Normalize(filter.FuelType);
+
+                logic.Find(filter);
+            });
+
+
 
             unparkCommand.Add(parkRegistryNumberOption);
             unparkCommand.SetAction(p => logic.Unpark(p.GetValue(parkRegistryNumberOption)));
@@ -78,6 +131,21 @@ namespace GaragePractice
             Root.Add(unparkCommand);
             Root.Add(parkCommand);
             Root.Add(exitCommand);
+        }
+
+        private string? Normalize(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            return char.ToUpper(value[0]) + value.Substring(1).ToLower();
+        }
+        private string? NormalizeReg(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            return value.All(char.IsLetterOrDigit) ? value.ToUpper() : null;
         }
     }
 }

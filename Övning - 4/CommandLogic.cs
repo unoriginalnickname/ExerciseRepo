@@ -6,12 +6,12 @@ namespace Övning___4
 {
     public class CommandLogic
     {
-        public Garage garage;
+        public Garage<IVehicle> garage;
         RootCommand root;
         public CommandLogic(RootCommand root)
         {
             this.root = root;
-            this.garage = new Garage(SetupGarageSize());
+            this.garage = new Garage<IVehicle>(SetupGarageSize(), true);
             SetupAutoPopulate(garage);
         }
 
@@ -39,35 +39,37 @@ namespace Övning___4
                 return;
             }
 
-            IVehicle vehicle = (IVehicle?)Activator.CreateInstance(Type.GetType("GaragePractice." + filter.VehicleType));
+            IVehicle vehicle = (IVehicle)Activator.CreateInstance(Type.GetType("GaragePractice." + filter.VehicleType)!)!;
             if (vehicle != null)
             {
                 vehicle.RegistryNumber = filter.RegNumber!;
                 vehicle.Fueltype = filter.FuelType!;
                 vehicle.Color = filter.Color!;
-                vehicle.NumWheels = filter.NumWheels!;
-                vehicle.UniqueProperty = filter.UniqueProperty!;
+                vehicle.NumWheels = filter.NumWheels ?? 0;
+                vehicle.UniquePropertyValue = filter.UniquePropertyValue!;
                 garage.ParkVehicle(vehicle);
                 View.PrintString("Parked. ");
             }
         }
 
+
+
+
         bool DoesRegisterNumberExist(string? regNumber)
         {
-            IVehicle[] temp = garage.GetIVehicleArray();
 
-            if (FilterVehicles
-                (temp, new Filter() { RegNumber = regNumber }).Length == 0)
+            if (!string.IsNullOrEmpty(regNumber))
             {
-                return false;
+               return garage.Any(v => string.Equals(v.RegistryNumber, regNumber, StringComparison.OrdinalIgnoreCase));
             }
-            return true;
+            return false;
         }
 
         public void Find(Filter filter)
         {
-            IVehicle[] filteredVehicles = FilterVehicles(garage.GetIVehicleArray(), filter);
-            View.PrintVehicles(ConvertVehiclesToFilterArray(filteredVehicles));
+            List<IVehicle> vehicles = garage.Where(v => v != null && Matches(v, filter)).ToList();
+
+            View.PrintVehicles(ConvertVehiclesToFilterArray(vehicles));
         }
         bool Matches(IVehicle vehicle, Filter filter)
         {
@@ -76,7 +78,7 @@ namespace Övning___4
                     return false;
 
             if (filter.NumWheels != null)
-                if (!string.Equals(vehicle.NumWheels, filter.NumWheels, StringComparison.OrdinalIgnoreCase))
+                if (vehicle.NumWheels == filter.NumWheels)
                     return false;
 
             if (filter.Color != null)
@@ -93,56 +95,27 @@ namespace Övning___4
 
             return true;
         }
-        IVehicle[] FilterVehicles(IVehicle[] vehicleArr, Filter filter)
-        {
-            IVehicle[] temp = new IVehicle[vehicleArr.Length];
-            int count = 0;
 
-            for (int i = 0; i < vehicleArr.Length; i++)
-            {
-                if (vehicleArr[i] != null && Matches(vehicleArr[i], filter))
-                {
-                    temp[count++] = vehicleArr[i];
-                }
-            }
-            IVehicle[] result = new IVehicle[count];
-            Array.Copy(temp, result, count);
-            return result;
-        }
-        IVehicle[]? RemoveNullFromVehicleArray(IVehicle[] arr)
-        {
-            int numberOfVehicles = garage.GetNumberOfVehiclesInGarage();
-            IVehicle[] result = new IVehicle[numberOfVehicles];
-            int count = 0;
 
-            for (int i = 0; i < arr.Length; i++)
-            {
-                if (arr[i] != null)
-                {
-                    result[count++] = arr[i];
-                }
-            }
-            return result;
-        }
-        private Filter[]? ConvertVehiclesToFilterArray(IVehicle[]? arr)
+        private List<Filter> ConvertVehiclesToFilterArray(List<IVehicle> arr)
         {
-            if (arr != null)
+            List<Filter> displayModelArray = new List<Filter>();
+            foreach (var vehicle in arr)
             {
-                Filter[] displayModelArray = new Filter[arr.Length];
-
-                int displayModelIndex = 0;
-                for (int i = 0; i < arr.Length; i++)
-                {
-                    displayModelArray[displayModelIndex] = ConvertVehicleToDisplay(arr[i]);
-                    displayModelIndex++;
-                }
-                return displayModelArray;
+                displayModelArray.Add(ConvertVehicleToDisplay(vehicle));
             }
-            else return null;
+
+            return displayModelArray;
         }
         public void ListAll()
         {
-            View.PrintVehicles(ConvertVehiclesToFilterArray(RemoveNullFromVehicleArray(garage.GetIVehicleArray())));
+            List<Filter> filters = new List<Filter>();
+
+            List<IVehicle> vehicles = garage.ToList();
+
+            filters = ConvertVehiclesToFilterArray(vehicles);
+
+            View.PrintVehicles(filters);
         }
 
         public void Unpark(string? regNumber)
@@ -153,7 +126,7 @@ namespace Övning___4
             }
         }
 
-        void SetupAutoPopulate(Garage garage)
+        void SetupAutoPopulate(Garage<IVehicle> garage)
         {
             View.PrintString("\nAutopopulate garage with vehicles? Y/N");
             string input = View.GetInput();
@@ -184,7 +157,8 @@ namespace Övning___4
                 Color = vehicle.Color,
                 NumWheels = vehicle.NumWheels,
                 FuelType = vehicle.Fueltype,
-                UniqueProperty = vehicle.UniqueProperty
+                UniquePropertyValue = vehicle.UniquePropertyValue,
+                UniquePropertyString = vehicle.UniquePropertyString
             };
             return filter;
         }

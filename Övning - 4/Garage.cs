@@ -1,141 +1,154 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using static System.Net.WebRequestMethods;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using Övning___4;
+using System.Collections;
 
 namespace GaragePractice
 {
-    public class Garage
+    public class Garage<T> : IEnumerable<T> where T : IVehicle
     {
-        
-      
+        private List<T> vehicleGarage;
+        private int maxSize;
+        private bool allowMultipleTypes;
+
         Dictionary<string, string> approvedVehicleTypes = new Dictionary<string, string>()
  {
-    { "Airplane",    "Wing span (m)"         },
-    { "Boat",        "Hull length (m)"        },
-    { "Bus",         "Number of stops"        },
-    { "Car",         "Number of doors"        },
-    { "Motorcycle",  "Engine size (cc)"       },
-    { "Ufo",         "Abduction capacity"     },
-    { "Uap",         "Classified"             },
+    { "Airplane", "Wing span (m)" },
+    { "Boat", "Hull length (m)" },
+    { "Bus", "Number of stops" },
+    { "Car", "Number of doors" },
+    { "Motorcycle", "Engine size (cc)" },
+    { "Ufo", "Abduction capacity" },
+    { "Uap", "Classified" },
  };
-
-        //    private readonly string[,] vehicleTypes = new string[,]
-        //    {
-        //{ "Airplane",    "Wing span (m)"         },
-        //{ "Boat",        "Hull length (m)"        },
-        //{ "Bus",         "Number of stops"        },
-        //{ "Car",         "Number of doors"        },
-        //{ "Motorcycle",  "Engine size (cc)"       },
-        //{ "Ufo",         "Abduction capacity"     },
-        //{ "Uap",         "Classified"             },
-        //    };
 
         public Dictionary<string, string> ApprovedVehicleTypes { get { return approvedVehicleTypes; } }
 
-        private IVehicle[] vehicleGarageArray;
         private readonly int defaultSize = 15;
 
         public Garage()
         {
             Console.WriteLine("Garage: creating garage with default size " + defaultSize);
-            vehicleGarageArray = new IVehicle[defaultSize];
+            maxSize = defaultSize;
+            vehicleGarage = new List<T>();
         }
 
-        public Garage(int garageSize)
+        public Garage(int garageSize, bool allowMultipleTypes = true)
         {
-            vehicleGarageArray = new IVehicle[garageSize];
+            maxSize = garageSize;
+            vehicleGarage = new List<T>();
+            this.allowMultipleTypes = allowMultipleTypes;
         }
 
-        public void ParkVehicle(IVehicle vehicle)
+        public void ParkVehicle(T item)
         {
-            if (FindFirstFreeParkingSlot() is int parkingSlot) //fancy syntax
-                vehicleGarageArray[parkingSlot] = vehicle;
-        }
-
-        private int? FindFirstFreeParkingSlot()
-        {
-            for (int i = 0; i < vehicleGarageArray.Length; i++)
-                if (vehicleGarageArray[i] == null)
-                    return i;
-            return null;
+            if (vehicleGarage.Count < maxSize)
+            {
+                vehicleGarage.Add(item);
+            }
+            else
+                Console.WriteLine("The garage is full. Cannot park vehicle with registry number " + item.RegistryNumber + ". ");
         }
 
         public bool UnParkVehicle(string? regPlateNumber)
         {
-            for (int i = 0; i < vehicleGarageArray.Length; i++)
+            if (vehicleGarage.Where(v => v.RegistryNumber == regPlateNumber).FirstOrDefault() is T vehicleToRemove)
             {
-                if (vehicleGarageArray[i] != null)
-                    if (vehicleGarageArray[i].RegistryNumber == regPlateNumber) ;
-                {
-                    vehicleGarageArray[i] = null;
-                    return true;
-                }
+                vehicleGarage.Remove(vehicleToRemove);
+                Console.WriteLine("Garage: Unparking successful. Vehicle with registry number " + regPlateNumber + " removed from garage. ");
+                return true;
             }
-            return false;
+            else
+            {
+                Console.WriteLine("Garage: Unparking failed. No registry number provided. ");
+                return false;
+            }
         }
 
-        public IVehicle[] GetIVehicleArray()
+        public IList<T> GetGarageToIList()
         {
-            return (IVehicle[])vehicleGarageArray.Clone();
+            return vehicleGarage;
         }
 
         public int GetNumberOfVehiclesInGarage()
         {
-            return NumberOfVehiclesInArray(this.vehicleGarageArray);
-        }
-        private int NumberOfVehiclesInArray(IVehicle[] arr)
-        {
-            int numberOfVehicles = 0;
-            for (int i = 0; i < arr.Length; i++)
-            {
-                if (arr[i] != null) numberOfVehicles++;
-            }
-            return numberOfVehicles;
+            return vehicleGarage.Count;
         }
 
+        private static Random random = new Random();
+
+        public static string GenerateRegNumber()
+        {
+
+            string letters = new string(
+                Enumerable.Range(0, 3)
+                    .Select(_ => (char)random.Next('A', 'Z' + 1))
+                    .ToArray());
+
+            string numbers = random.Next(100, 999).ToString();
+
+            return letters + numbers;
+        }
+
+  
         public void AutoPopulateGarage()
         {
             Console.WriteLine("Garage: Autopopulating...");
-            //garageSpace[0] = new Airplane("123", "green", "8", FuelType.ZeroPointModule, "nothing");
 
-            var keys = ApprovedVehicleTypes.Keys.ToList();
+            List<string> colors = new() { "Red", "Blue", "Black", "White", "Green", "Orange", "Magenta", "Chrome" };
+            List<string> gasTypes = new() { "Petrol", "Diesel", "Electric", "Hybrid" };
+            List<int> wheelCounts = new() { 2, 4, 6, 8 };
 
-            for (int i = 0; i < keys.Count; i++)
+            var allowedTypes = typeof(T) == typeof(IVehicle)
+                ? approvedVehicleTypes.Keys.Select(k => Type.GetType("GaragePractice." + k)!).ToList()
+                : new List<Type> { typeof(T) };
+
+            int freeSlots = 1;
+            for (int i = 0; i < maxSize - freeSlots; i++)
             {
-                string vehicleType = keys[i];
+                Type vehicleType = allowedTypes[i % allowedTypes.Count];
+                T vehicle = (T)Activator.CreateInstance(vehicleType)!;
 
-                IVehicle vehicle = (IVehicle?)Activator.CreateInstance(Type.GetType("GaragePractice." + vehicleType));
+                string reg;
+                do
+                {
+                    reg = GenerateRegNumber();
+                } while (vehicleGarage.Any(v => v.RegistryNumber == reg));
 
-                vehicle.RegistryNumber = "123-ABC";
-                vehicle.Color = "Blue";
-                vehicle.Fueltype = "Gas";
-                vehicle.NumWheels = "2";
-                vehicle.UniqueProperty = "test";
-                vehicleGarageArray[i] = vehicle;
+                vehicle.RegistryNumber = reg;
+                vehicle.Color = RandomHelper.Pick(colors);
+                vehicle.Fueltype = RandomHelper.Pick(gasTypes);
+                vehicle.NumWheels = RandomHelper.Pick(wheelCounts);
+                vehicle.UniquePropertyString = approvedVehicleTypes[vehicleType.Name];
+                vehicle.UniquePropertyValue = uniquePropertyValueGenerators[vehicleType]();
+
+                vehicleGarage.Add(vehicle);
             }
         }
 
-        public IVehicle[] GetGarageContents()
-        {
-            return vehicleGarageArray;
-        }
+
+        Dictionary<Type, Func<string>> uniquePropertyValueGenerators = new()
+{
+    { typeof(Airplane),   () => $"{Random.Shared.Next(10, 80)} m" },
+    { typeof(Boat),       () => $"{Random.Shared.Next(5, 200)} m" },
+    { typeof(Bus),        () => $"{Random.Shared.Next(10, 200)} stops" },
+    { typeof(Car),        () => $"{Random.Shared.Next(2, 6)} doors" },
+    { typeof(Motorcycle), () => $"{Random.Shared.Next(50, 1500)} cc" },
+    { typeof(Ufo),        () => $"{Random.Shared.Next(1, 1000)} abductees" },
+    { typeof(Uap),        () => "Classified" }
+};
 
         internal bool VehicleIsApprovedType(string vehicleType)
         {
-            int length = ApprovedVehicleTypes.Keys.Count;
-            var keys = ApprovedVehicleTypes.Keys.ToList();
+        return approvedVehicleTypes.ContainsKey(vehicleType);
+        }
 
-            for (int i = 0; i < length; i++)
-            {
-                if (keys[i] == vehicleType)
-                {
-                    Console.WriteLine("Vehicletype is approved. ");
-                    return true;
-                }
-            }
-            Console.WriteLine("Vehicletype failed approval. ");
-            return false;
+        public IEnumerator<T> GetEnumerator()
+        {
+            return vehicleGarage.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

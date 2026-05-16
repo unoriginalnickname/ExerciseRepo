@@ -9,18 +9,18 @@
             Console.WriteLine(s);
         }
 
-        public static void PrintVehicles(Filter[]? displayModelArray)
+        public static void PrintVehicles(List<Filter> displayModelArray)
         {
             if (displayModelArray == null)
             {
                 Console.WriteLine("No vehicles found. ");
             }
-            Console.WriteLine("Amount found: " + displayModelArray.Length);
+            Console.WriteLine("Amount found: " + displayModelArray.Count);
             //could format strings into columns
 
-            for (int i = 0; i < displayModelArray.Length; i++)
+            foreach (Filter filter in displayModelArray)
             {
-                Console.WriteLine(displayModelArray[i].ToString());
+                Console.WriteLine(filter.ToString());
             }
         }
 
