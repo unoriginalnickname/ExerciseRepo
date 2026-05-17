@@ -1,130 +1,121 @@
 ﻿using GaragePractice;
 using Övning___4;
+using System.Diagnostics.Metrics;
 using System.Text;
 
 public class GarageManager
 {
-    private readonly Garage<IVehicle> garage;
 
-    public GarageManager(int garageSize = 15) => garage = new Garage<IVehicle>(garageSize);
 
-    private bool IsGarageFull => garage.Count() >= garage.MaxSize;
+    private Dictionary<Type, IGarage> garages = new();
 
-    public bool IsRegNumberDuplicate(string regNumber) => garage.Any(v => v.RegistryNumber == regNumber);
+    Garage<IVehicle> backupGarage = new Garage<IVehicle>();
 
-    public void ParkVehicle(FilterX filter)
+
+    public GarageManager(int garageSize = 15)
     {
-        if (IsGarageFull) { View.PrintString("Garage full."); return; }
-        if (IsRegNumberDuplicate(filter.RegNumber)) { View.PrintString("Duplicate reg number."); return; }
-        if (!garage.ApprovedVehicleTypes.ContainsKey(filter.VehicleType)) { View.PrintString("Vehicle not approved."); return; }
+        garages.Add(typeof(Car), new Garage<Car>(garageSize));
+        garages.Add(typeof(Airplane), new Garage<Airplane>(garageSize));
+        garages.Add(typeof(Boat), new Garage<Boat>(garageSize));
+        garages.Add(typeof(Bus), new Garage<Bus>(garageSize));
+        garages.Add(typeof(Motorcycle), new Garage<Motorcycle>(garageSize));
+        garages.Add(typeof(Ufo), new Garage<Ufo>(garageSize));
+        garages.Add(typeof(Uap), new Garage<Uap>(garageSize));
+    }
 
-        garage.ParkVehicle(VehicleFactory.CreateVehicle(filter) ?? throw new InvalidOperationException("Failed to create vehicle."));
-        View.PrintString("Parked.");
+    private bool IsGarageFull => backupGarage.Count() >= backupGarage.MaxSize;
+
+    public bool IsRegNumberDuplicate(string regNumber) => backupGarage.Any(v => v.RegistryNumber == regNumber);
+
+    public void ParkVehicle(Filter filter)
+    {
+        var vehicle = VehicleFactory.CreateVehicle(filter);
+
+        if (garages.TryGetValue(Type.GetType(filter.VehicleType), out var garage))
+        {
+            garage.ParkVehicle(vehicle);
+        }
+        else
+        {
+            backupGarage.ParkVehicle(vehicle);
+        }
     }
 
     public void ParkRandom()
     {
-        if (IsGarageFull) { View.PrintString("Garage is full."); return; }
-
-        try
+        foreach (var garage in garages)
         {
-            var existingRegs = new HashSet<string>(garage.Select(v => v.RegistryNumber));
-            var vehicle = VehicleFactory.CreateRandomVehicle(garage, existingRegs);
-            garage.ParkVehicle(vehicle);
-            View.PrintString("Parked random: " + vehicle.RegistryNumber);
+          garage.Value.ParkVehicle(VehicleFactory.CreateRandomVehicle(garage.Key));
         }
-        catch (Exception ex) { View.PrintString("Error: " + ex.Message); }
     }
+
 
     public void Unpark(string regNumber)
     {
-        if(garage.Count() > 0)
-        {
-            try
-            {
-                var vehicle = garage.FirstOrDefault(v => v.RegistryNumber == regNumber);
-                if (vehicle != null)
-                {
-                    garage.Unpark(vehicle);
-                    View.PrintString("Unparked: " + vehicle.RegistryNumber);
-                }
-                else View.PrintString("Vehicle not found.");
-            }
-            catch (Exception ex)
-            {
-                View.PrintString("Could not unpark vehicle: " + ex.Message);
-                throw;
-            }
-   
-        }
-        else
-            View.PrintString("Garage is empty. ");
-
+        backupGarage.Unpark(regNumber);
+        View.PrintString("Unparked: ");
     }
 
     public void UnparkRandomVehicle()
     {
-        if (garage.Count() == 0) { View.PrintString("Garage empty."); return; }
-
-        var vehicle = RandomHelper.Pick(garage);
-        garage.Unpark(vehicle);
+        if (backupGarage.Count() == 0) { View.PrintString("Garage empty."); return; }
+        var vehicle = RandomHelper.Pick(backupGarage);
+        backupGarage.Unpark(vehicle.RegistryNumber);
         View.PrintString("Unparked random: " + vehicle.RegistryNumber);
     }
 
     // Helper method that lists vehicles optionally filtered
-    private void ListVehicles(FilterX? filter)
+    private void ListVehicles(Filter filter)
     {
-       
-        var vehicles2 = garage
+        var vehicles2 = backupGarage
             .Where(v => Matches(v, filter))
             .Select(ConvertVehicleToFilter)
             .ToList();
-
         View.PrintVehicles(vehicles2);
     }
     private void ListVehicles()
     {
-        var vehicles2 = garage
-             .Select(ConvertVehicleToFilter)
-             .ToList();
-
-        View.PrintVehicles(vehicles2);
+        foreach (var garage in garages)
+        {
+            foreach (var item in garage.Value.GetVehicles())
+            {
+                Filter filter = ConvertVehicleToFilter(item);
+                View.PrintString(filter.ToString());
+            }
+        }
     }
 
-    // Now ListAll becomes
     public void ListAll() => ListVehicles();
 
-    // And Find becomes
-    public void Find(FilterX filter) => ListVehicles(filter);
+    public void Find(Filter filter) => ListVehicles(filter);
     public void AutoPopulateGarage()
     {
         View.PrintString("Autopopulating...");
-        for (int i = 0; i < garage.MaxSize - 1; i++) ParkRandom();
+        for (int i = 0; i < backupGarage.MaxSize - 1; i++) ParkRandom();
     }
 
     public void ListApprovedVehicleTypes()
     {
         var sb = new StringBuilder("\nApproved vehicle types:\n");
-        foreach (var kv in garage.ApprovedVehicleTypes)
+        foreach (var kv in VehicleTypeRegistry.ApprovedVehicleTypes)
             sb.AppendLine($"{kv.Key}, unique: {kv.Value}");
         View.PrintString(sb.ToString());
     }
 
-    // --- helpers ---
-    private bool Matches(IVehicle v, FilterX f) =>
-        (f.RegNumber == null || v.RegistryNumber.Equals(f.RegNumber, StringComparison.OrdinalIgnoreCase)) &&
+    private bool Matches(IVehicle v, Filter f) =>
+        (f.RegistryNumber == null || v.RegistryNumber.Equals(f.RegistryNumber, StringComparison.OrdinalIgnoreCase)) &&
         (f.NumWheels == null || v.NumWheels == f.NumWheels) &&
         (f.Color == null || v.Color.Equals(f.Color, StringComparison.OrdinalIgnoreCase)) &&
         (f.VehicleType == null || v.GetType().Name.Equals(f.VehicleType, StringComparison.OrdinalIgnoreCase)) &&
-        (f.FuelType == null || v.Fueltype.ToString().Equals(f.FuelType, StringComparison.OrdinalIgnoreCase));
+        (f.FuelType == null || v.FuelType.ToString().Equals(f.FuelType, StringComparison.OrdinalIgnoreCase));
 
-    private FilterX ConvertVehicleToFilter(IVehicle v) => new FilterX
+    private Filter ConvertVehicleToFilter(IVehicle v) => new Filter
     {
         VehicleType = v.GetType().Name,
-        RegNumber = v.RegistryNumber,
+        RegistryNumber = v.RegistryNumber,
         Color = v.Color,
         NumWheels = v.NumWheels,
-        FuelType = v.Fueltype,
+        FuelType = v.FuelType,
         UniquePropertyValue = v.UniquePropertyValue,
         UniquePropertyString = v.UniquePropertyString
     };

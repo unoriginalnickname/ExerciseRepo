@@ -14,7 +14,7 @@ public class CommandLogic
         int garageSize = AskGarageSize();
         this.garageManager = new GarageManager(garageSize);
 
-        SetupAutoPopulate();
+        AskAutoPopulate();
     }
 
     private int AskGarageSize()
@@ -38,7 +38,7 @@ public class CommandLogic
 
     internal void Exit() => run = false;
 
-    private void SetupAutoPopulate()
+    private void AskAutoPopulate()
     {
         View.PrintString("\nAutopopulate garage with vehicles? Y/N");
         if (string.Equals(View.GetInput(), "Y", StringComparison.InvariantCultureIgnoreCase))
@@ -48,11 +48,11 @@ public class CommandLogic
     }
 
  
-    public void ParkVehicle(FilterX filter) => garageManager.ParkVehicle(filter);
+    public void ParkVehicle(Filter filter) => garageManager.ParkVehicle(filter);
     public void Unpark(string regNumber) => garageManager.Unpark(regNumber);
     public void ParkRandom() => garageManager.ParkRandom();
     public void UnparkRandomVehicle() => garageManager.UnparkRandomVehicle();
     public void ListAll() => garageManager.ListAll();
-    public void Find(FilterX filter) => garageManager.Find(filter);
+    public void Find(Filter filter) => garageManager.Find(filter);
     public void ListApprovedVehicleTypes() => garageManager.ListApprovedVehicleTypes();
 }

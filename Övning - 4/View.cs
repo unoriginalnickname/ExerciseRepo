@@ -8,8 +8,15 @@
         {
             Console.WriteLine(s);
         }
+        public static void PrintIEnumerable(IEnumerable<string> s)
+        {
+            foreach (var item in s)
+            {
+                Console.WriteLine(s);
+            }
+        }
 
-        public static void PrintVehicles(List<FilterX> displayModelArray)
+        public static void PrintVehicles(List<Filter> displayModelArray)
         {
             if (displayModelArray == null)
             {
@@ -18,7 +25,7 @@
             Console.WriteLine("Amount found: " + displayModelArray.Count);
             //could format strings into columns
 
-            foreach (FilterX filter in displayModelArray)
+            foreach (Filter filter in displayModelArray)
             {
                 Console.WriteLine(filter.ToString());
             }

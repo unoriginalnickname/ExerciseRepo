@@ -1,4 +1,5 @@
-﻿using GaragePractice;
+﻿using System.Linq;
+using GaragePractice;
 using Övning___4;
 using System.CommandLine;
 using static System.Net.WebRequestMethods;
@@ -61,25 +62,10 @@ namespace Övning___4.Commands
                 string? color = p.GetValue(parkColorOption);
                 string? unique = p.GetValue(parkUniqueProperty);
                 int? wheels = p.GetValue(parkWheelsOption);
-           
 
-                var filter = new FilterX
+                if (!FilterFactory.TryCreate(reg, type, fuel, color, unique, wheels, requireAllFields: true, out Filter filter, out List<string> errors))
                 {
-                    NumWheels = wheels,
-                    Color = color,
-                    FuelType = fuel,
-                    RegNumber = reg,
-                    VehicleType = type,
-                    UniquePropertyValue = unique
-                };
-                filter.Color = Normalize(filter.Color);
-                filter.VehicleType = Normalize(filter.VehicleType);
-                filter.RegNumber = NormalizeReg(filter.RegNumber);
-                filter.FuelType = Normalize(filter.FuelType);
-
-                if (!FilterValidator.ValidateForPark(filter))
-                {
-                    Console.WriteLine("Invalid vehicle data for parking.");
+                    View.PrintIEnumerable(errors);
                     return;
                 }
 
@@ -97,24 +83,9 @@ namespace Övning___4.Commands
                 string? unique = p.GetValue(uniqueOption);
                 int? wheels = p.GetValue(wheelsOption);
 
-                var filter = new FilterX
+                if (!FilterFactory.TryCreate(reg, type, fuel, color, unique, wheels, requireAllFields: false, out Filter filter, out List<string> errors))
                 {
-                    NumWheels = wheels,
-                    Color = color,
-                    FuelType = fuel,
-                    RegNumber = reg,
-                    VehicleType = type,
-                    UniquePropertyValue = unique
-                };
-
-                filter.Color = Normalize(filter.Color);
-                filter.VehicleType = Normalize(filter.VehicleType);
-                filter.RegNumber = NormalizeReg(filter.RegNumber);
-                filter.FuelType = Normalize(filter.FuelType);
-
-                if (!FilterValidator.ValidateForFind(filter))
-                {
-                    Console.WriteLine("Invalid vehicle data for search.");
+                    View.PrintIEnumerable(errors);
                     return;
                 }
 
@@ -140,21 +111,6 @@ namespace Övning___4.Commands
             Root.Add(unparkCommand);
             Root.Add(parkCommand);
             Root.Add(exitCommand);
-        }
-
-        private string? Normalize(string? value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return null;
-
-            return char.ToUpper(value[0]) + value.Substring(1).ToLower();
-        }
-        private string? NormalizeReg(string? value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return null;
-
-            return value.All(char.IsLetterOrDigit) ? value.ToUpper() : null;
         }
     }
 }
