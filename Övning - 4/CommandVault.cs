@@ -21,10 +21,13 @@ namespace GaragePractice
         Command listApprovedVehicleTypes = new("listapproved", "Lists all approved vehicle types for parking in the garage.");
         Command findCommand = new("find", "--vehicletype --regnum --color --wheels --fuel" +
             "\nexample: find --fuel Gas --vehicletype Car");
+        Command parkRandom = new("parkrandom", "attempts to park a random vehicle");
+        Command unparkRandom = new("unparkrandom", "attempts to unpark a random vehicle");
         Command unparkCommand = new("unpark", "--regnum" +
             "\n example: unpark --regnum 123-ABC");
         Command parkCommand = new("park", "--regnum --vehicletype --color --wheels --fuel --unique (ALL REQUIRED)" +
             "\n example: park --regnum 123-ABC --vehicletype car --color Red --wheels 2 --fuel Gas");
+        
         Command exitCommand = new("exit");
 
 
@@ -67,6 +70,10 @@ namespace GaragePractice
                     VehicleType = type,
                     UniquePropertyValue = unique
                 };
+                filter.Color = Normalize(filter.Color);
+                filter.VehicleType = Normalize(filter.VehicleType);
+                filter.RegNumber = NormalizeReg(filter.RegNumber);
+                filter.FuelType = Normalize(filter.FuelType);
 
                 if (!FilterValidator.ValidateForPark(filter))
                 {
@@ -74,12 +81,7 @@ namespace GaragePractice
                     return;
                 }
 
-                filter.Color = Normalize(filter.Color);
-                filter.VehicleType = Normalize(filter.VehicleType);
-                filter.RegNumber = NormalizeReg(filter.RegNumber);
-                filter.FuelType = Normalize(filter.FuelType);
-
-                logic.Park(filter);
+                logic.ParkVehicle(filter);
             });
 
             findCommand.Add(registryNumberOption); findCommand.Add(vehicleTypeOption); findCommand.Add(wheelsOption); findCommand.Add(colorOption); findCommand.Add(fuelTypeOption); findCommand.Add(uniqueOption);
@@ -103,16 +105,16 @@ namespace GaragePractice
                     UniquePropertyValue = unique
                 };
 
+                filter.Color = Normalize(filter.Color);
+                filter.VehicleType = Normalize(filter.VehicleType);
+                filter.RegNumber = NormalizeReg(filter.RegNumber);
+                filter.FuelType = Normalize(filter.FuelType);
+
                 if (!FilterValidator.ValidateForFind(filter))
                 {
                     Console.WriteLine("Invalid vehicle data for search.");
                     return;
                 }
-
-                filter.Color = Normalize(filter.Color);
-                filter.VehicleType = Normalize(filter.VehicleType);
-                filter.RegNumber = NormalizeReg(filter.RegNumber);
-                filter.FuelType = Normalize(filter.FuelType);
 
                 logic.Find(filter);
             });
@@ -122,11 +124,16 @@ namespace GaragePractice
             unparkCommand.Add(parkRegistryNumberOption);
             unparkCommand.SetAction(p => logic.Unpark(p.GetValue(parkRegistryNumberOption)));
 
+            parkRandom.SetAction(p => logic.ParkRandom());
+            unparkRandom.SetAction(p => logic.UnparkRandomVehicle());
+
             exitCommand.SetAction(p => logic.Exit());
 
             //add the commands to the root command
             Root.Add(listall);
             Root.Add(listApprovedVehicleTypes);
+            Root.Add(parkRandom);
+            Root.Add(unparkRandom);
             Root.Add(findCommand);
             Root.Add(unparkCommand);
             Root.Add(parkCommand);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GaragePractice;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,6 +9,7 @@ namespace Övning___4
     {
         private static Random rnd = new();
 
-        public static T Pick<T>(IList<T> list) => list[rnd.Next(list.Count)];
+        public static T Pick<T>(IEnumerable<T> list) => list.ElementAt(rnd.Next(list.Count()));
+
     }
 }
