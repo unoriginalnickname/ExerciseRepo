@@ -10,7 +10,7 @@ public static class FilterValidator
         return value.All(char.IsLetterOrDigit);
     }
 
-    public static bool ValidateForPark(Filter f)
+    public static bool ValidateForPark(FilterX f)
     {
         if (!IsAlphanumeric(f.RegNumber))
             return false;
@@ -27,7 +27,7 @@ public static class FilterValidator
         return true;
     }
 
-    public static bool ValidateForFind(Filter f)
+    public static bool ValidateForFind(FilterX f)
     {
         if (f.RegNumber != null && !IsAlphanumeric(f.RegNumber))
             return false;

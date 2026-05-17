@@ -2,7 +2,7 @@
 
 namespace GaragePractice
 {
-    public struct Filter
+    public struct FilterX
     {
         public bool IsValidForPark()
         {

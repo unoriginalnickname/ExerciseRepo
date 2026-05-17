@@ -1,8 +1,9 @@
-﻿using Övning___4;
+﻿using GaragePractice;
+using Övning___4;
 using System.CommandLine;
 using static System.Net.WebRequestMethods;
 
-namespace GaragePractice
+namespace Övning___4.Commands
 {
     public class CommandVault
     {
@@ -32,7 +33,7 @@ namespace GaragePractice
 
 
         Option<string> registryNumberOption = new Option<string>("--regnum") { HelpName = "platenumber", Required = false };
-        Option<int> wheelsOption = new("--wheels") { HelpName = "Amount", Required = false }; //future implementations: list all the valid color, vehicle options
+        Option<int?> wheelsOption = new("--wheels") { HelpName = "Amount", Required = false };
         Option<string> colorOption = new("--color") { HelpName = "Color", Required = false };
         Option<string> vehicleTypeOption = new("--vehicletype") { HelpName = "Vehicletype", Required = false };
         Option<string> fuelTypeOption = new("--fuel") { HelpName = "Fuel type", Required = false };
@@ -60,8 +61,9 @@ namespace GaragePractice
                 string? color = p.GetValue(parkColorOption);
                 string? unique = p.GetValue(parkUniqueProperty);
                 int? wheels = p.GetValue(parkWheelsOption);
+           
 
-                var filter = new Filter
+                var filter = new FilterX
                 {
                     NumWheels = wheels,
                     Color = color,
@@ -95,7 +97,7 @@ namespace GaragePractice
                 string? unique = p.GetValue(uniqueOption);
                 int? wheels = p.GetValue(wheelsOption);
 
-                var filter = new Filter
+                var filter = new FilterX
                 {
                     NumWheels = wheels,
                     Color = color,

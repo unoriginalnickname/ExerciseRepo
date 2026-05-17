@@ -12,7 +12,7 @@ public class GarageManager
 
     public bool IsRegNumberDuplicate(string regNumber) => garage.Any(v => v.RegistryNumber == regNumber);
 
-    public void ParkVehicle(Filter filter)
+    public void ParkVehicle(FilterX filter)
     {
         if (IsGarageFull) { View.PrintString("Garage full."); return; }
         if (IsRegNumberDuplicate(filter.RegNumber)) { View.PrintString("Duplicate reg number."); return; }
@@ -38,9 +38,28 @@ public class GarageManager
 
     public void Unpark(string regNumber)
     {
-        var vehicle = garage.FirstOrDefault(v => v.RegistryNumber == regNumber);
-        if (vehicle != null) { garage.Unpark(vehicle); View.PrintString("Unparked: " + vehicle.RegistryNumber); }
-        else View.PrintString("Vehicle not found.");
+        if(garage.Count() > 0)
+        {
+            try
+            {
+                var vehicle = garage.FirstOrDefault(v => v.RegistryNumber == regNumber);
+                if (vehicle != null)
+                {
+                    garage.Unpark(vehicle);
+                    View.PrintString("Unparked: " + vehicle.RegistryNumber);
+                }
+                else View.PrintString("Vehicle not found.");
+            }
+            catch (Exception ex)
+            {
+                View.PrintString("Could not unpark vehicle: " + ex.Message);
+                throw;
+            }
+   
+        }
+        else
+            View.PrintString("Garage is empty. ");
+
     }
 
     public void UnparkRandomVehicle()
@@ -53,9 +72,10 @@ public class GarageManager
     }
 
     // Helper method that lists vehicles optionally filtered
-    private void ListVehicles(Filter filter)
+    private void ListVehicles(FilterX? filter)
     {
-       var vehicles2 = garage
+       
+        var vehicles2 = garage
             .Where(v => Matches(v, filter))
             .Select(ConvertVehicleToFilter)
             .ToList();
@@ -75,7 +95,7 @@ public class GarageManager
     public void ListAll() => ListVehicles();
 
     // And Find becomes
-    public void Find(Filter filter) => ListVehicles(filter);
+    public void Find(FilterX filter) => ListVehicles(filter);
     public void AutoPopulateGarage()
     {
         View.PrintString("Autopopulating...");
@@ -91,14 +111,14 @@ public class GarageManager
     }
 
     // --- helpers ---
-    private bool Matches(IVehicle v, Filter f) =>
+    private bool Matches(IVehicle v, FilterX f) =>
         (f.RegNumber == null || v.RegistryNumber.Equals(f.RegNumber, StringComparison.OrdinalIgnoreCase)) &&
-        (f.NumWheels == 0 || v.NumWheels == f.NumWheels) &&
+        (f.NumWheels == null || v.NumWheels == f.NumWheels) &&
         (f.Color == null || v.Color.Equals(f.Color, StringComparison.OrdinalIgnoreCase)) &&
         (f.VehicleType == null || v.GetType().Name.Equals(f.VehicleType, StringComparison.OrdinalIgnoreCase)) &&
         (f.FuelType == null || v.Fueltype.ToString().Equals(f.FuelType, StringComparison.OrdinalIgnoreCase));
 
-    private Filter ConvertVehicleToFilter(IVehicle v) => new Filter
+    private FilterX ConvertVehicleToFilter(IVehicle v) => new FilterX
     {
         VehicleType = v.GetType().Name,
         RegNumber = v.RegistryNumber,

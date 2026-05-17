@@ -11,7 +11,7 @@ public class CommandLogic
     {
         this.root = root;
 
-        int garageSize = AskGarageSize(); // <--- ask the user here
+        int garageSize = AskGarageSize();
         this.garageManager = new GarageManager(garageSize);
 
         SetupAutoPopulate();
@@ -48,11 +48,11 @@ public class CommandLogic
     }
 
  
-    public void ParkVehicle(Filter filter) => garageManager.ParkVehicle(filter);
+    public void ParkVehicle(FilterX filter) => garageManager.ParkVehicle(filter);
     public void Unpark(string regNumber) => garageManager.Unpark(regNumber);
     public void ParkRandom() => garageManager.ParkRandom();
     public void UnparkRandomVehicle() => garageManager.UnparkRandomVehicle();
     public void ListAll() => garageManager.ListAll();
-    public void Find(Filter filter) => garageManager.Find(filter);
+    public void Find(FilterX filter) => garageManager.Find(filter);
     public void ListApprovedVehicleTypes() => garageManager.ListApprovedVehicleTypes();
 }

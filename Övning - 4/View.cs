@@ -9,7 +9,7 @@
             Console.WriteLine(s);
         }
 
-        public static void PrintVehicles(List<Filter> displayModelArray)
+        public static void PrintVehicles(List<FilterX> displayModelArray)
         {
             if (displayModelArray == null)
             {
@@ -18,7 +18,7 @@
             Console.WriteLine("Amount found: " + displayModelArray.Count);
             //could format strings into columns
 
-            foreach (Filter filter in displayModelArray)
+            foreach (FilterX filter in displayModelArray)
             {
                 Console.WriteLine(filter.ToString());
             }

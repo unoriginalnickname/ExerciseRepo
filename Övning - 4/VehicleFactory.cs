@@ -7,7 +7,7 @@ namespace Övning___4
 {
     public static class VehicleFactory
     {
-        public static IVehicle CreateVehicle(Filter filter)
+        public static IVehicle CreateVehicle(FilterX filter)
         {
             if (!VehicleCreators.TryGetValue(filter.VehicleType, out var factory))
                 throw new ArgumentException($"Vehicle type '{filter.VehicleType}' is not approved.");
@@ -16,7 +16,7 @@ namespace Övning___4
             vehicle.RegistryNumber = filter.RegNumber ?? throw new ArgumentException("RegNumber is required");
             vehicle.Fueltype = filter.FuelType ?? throw new ArgumentException("FuelType is required");
             vehicle.Color = filter.Color ?? "Unknown";
-            vehicle.NumWheels = filter.NumWheels ?? 0;
+            vehicle.NumWheels = filter.NumWheels ?? throw new ArgumentException("NumWheels is required");
             vehicle.UniquePropertyValue = filter.UniquePropertyValue ?? "Unknown";
 
             return vehicle;
@@ -65,7 +65,7 @@ namespace Övning___4
 
 
                 // Build filter with random properties
-                var filter = new Filter
+                var filter = new FilterX
                 {
                     VehicleType = vehicleType.Name,
                     RegNumber = GenerateRegNumber(),
