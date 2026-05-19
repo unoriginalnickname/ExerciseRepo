@@ -8,31 +8,6 @@ public class CommandRouter
     private readonly RootCommand root;
     private bool run = true;
 
-    //TODO
-
-
-    //Add or remove garages, then save to file
-    public void AddGarage() //addgarage, viewgarages, viewspecificgaragecontents
-    {
-
-    }
-
-    //View available garages
-    public void ViewGarages()
-    {
-
-    }
-
-    //View specific garage //perhaps by garage ID, or index in the list, or by name, or something else 
-    public void ViewSpecificGarage()
-    {
-
-    }
-
-    //One demo function that autocreates garages and autopopulates.
-
-
-
     public CommandRouter(RootCommand root)
     {
         this.root = root;
@@ -57,7 +32,7 @@ public class CommandRouter
     public void Unpark(string regNumber) => garageManager.Unpark(regNumber);
     public void ParkRandom() => garageManager.ParkRandom();
     public void UnparkRandomVehicle() => garageManager.UnparkRandomVehicle();
-    public void ListAll() => garageManager.ListAll();
+    public void ListAll() => garageManager.ListAllVehicles();
     public void Find(Filter filter) => garageManager.Find(filter);
     public void ListApprovedVehicleTypes() => garageManager.ListApprovedVehicleTypes();
 
@@ -71,17 +46,14 @@ public class CommandRouter
     {
         garageManager.CreateGarage(garageType, garageSize, garageName);
     }
-
     internal void ListSpecificGarageContents(string[]? strings)
     {
         garageManager.ListSpecificGarage(string.Join(" ", strings));
     }
-
     internal void CreateOneOfEachGarage()
     {
         garageManager.CreateOneOfEachGarage();
     }
-
     internal void Autopopulate()
     {
         garageManager.AutoPopulateGarages();

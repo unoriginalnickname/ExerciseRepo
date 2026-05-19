@@ -7,17 +7,6 @@ namespace Övning___4.Misc
 {
     public static class VehicleFactory
     {
-        private static Random random = new Random();
-        private static readonly Dictionary<string, Func<IVehicle>> VehicleCreators = new()
-{
-    { "Car", () => new Car() },
-    { "Bus", () => new Bus() },
-    { "Motorcycle", () => new Motorcycle() },
-    { "Airplane", () => new Airplane() },
-    { "Boat", () => new Boat() },
-    { "Ufo", () => new Ufo() },
-    { "Uap", () => new Uap() }
-};
         private static Dictionary<Type, string> uniquePropertyStrings = new()
 {
     { typeof(Airplane),   "Wingspan" },
@@ -40,7 +29,9 @@ namespace Övning___4.Misc
     { typeof(Uap),        () => "Classified" }
 };
 
-
+        private static readonly List<string> Colors = new() { "Red", "Blue", "Black", "White", "Green", "Orange", "Magenta", "Chrome" };
+        private static readonly List<string> FuelTypes = new() { "Petrol", "Diesel", "Electric", "Hybrid" };
+        private static readonly List<int> WheelOptions = new() { 2, 4, 6, 8 };
 
         public static IVehicle CreateVehicle(Filter filter)
         {
@@ -61,45 +52,28 @@ namespace Övning___4.Misc
 
         public static IVehicle CreateRandomVehicle(Type type)
         {
-            try
+            var filter = new Filter
             {
-                Type vehicleType = type;
-                if (vehicleType == typeof(IVehicle))
-                {
-                    string typeName = RandomHelper.Pick(VehicleTypeRegistry.ApprovedVehicleTypes.Keys.ToList());
-                    Type? pickedType = Type.GetType("GaragePractice." + typeName);
-                    if (pickedType == null)
-                        throw new InvalidOperationException($"Type '{typeName}' could not be found.");
-                    vehicleType = pickedType;
-                }
+                VehicleType = type.Name,
+                RegistryNumber = GenerateRegNumber(),
+                Color = RandomHelper.Pick(Colors),
+                FuelType = RandomHelper.Pick(FuelTypes),
+                NumWheels = RandomHelper.Pick(WheelOptions),
+                UniquePropertyValue = uniquePropertyValue[type](),
+                UniquePropertyString = uniquePropertyStrings[type]
+            };
 
-                var filter = new Filter
-                {
-                    VehicleType = vehicleType.Name,
-                    RegistryNumber = GenerateRegNumber(),
-                    Color = RandomHelper.Pick(new List<string> { "Red", "Blue", "Black", "White", "Green", "Orange", "Magenta", "Chrome" }),
-                    FuelType = RandomHelper.Pick(new List<string> { "Petrol", "Diesel", "Electric", "Hybrid" }),
-                    NumWheels = RandomHelper.Pick(new List<int> { 2, 4, 6, 8 }),
-                    UniquePropertyValue = uniquePropertyValue[vehicleType](),
-                    UniquePropertyString = uniquePropertyStrings[vehicleType]
-                };
-
-                return CreateVehicle(filter);
-            }
-            catch (Exception ex) 
-            {
-                throw;
-            }
+            return CreateVehicle(filter);
         }
 
         public static string GenerateRegNumber()
         {
             string letters = new string(
                 Enumerable.Range(0, 3)
-                    .Select(_ => (char)random.Next('A', 'Z' + 1))
+                    .Select(_ => (char)Random.Shared.Next('A', 'Z' + 1))
                     .ToArray());
 
-            string numbers = random.Next(100, 999).ToString();
+            string numbers = Random.Shared.Next(100, 999).ToString();
             return letters + numbers;
         }
     }

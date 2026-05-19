@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using Övning___4;
-using System.CommandLine;
-using static System.Net.WebRequestMethods;
+﻿using System.CommandLine;
 using Övning___4.ViewModel;
 
 namespace Övning___4.Commands
@@ -10,187 +7,176 @@ namespace Övning___4.Commands
     {
         public CommandVault()
         {
-            Root = new RootCommand();
-            Root.Description = "Enter the command followed by --help to see commands.";
-            InitializeCommands();
+            Root = new("Enter the command followed by --help to see commands.");
             logic = new CommandRouter(Root);
+            InitializeCommands();
             logic.Run();
         }
 
         RootCommand Root;
         CommandRouter logic;
 
-       
 
-        Command demo = new("demo", "Creates one garage of each type of random size and populates each garage");
-        Command oneOfEachGarage = new("oneofeach", "Creates one garage of each type of random size");
-        Command autoPopulate = new("autopopulate", "Autopopulates each garage");
-
-
-        Command createGarage = new("creategarage");
-
-        Command listAllVehicles = new("listallvehicles", "Lists all vehicles");
-        Command listAllGarages = new("listallgarages", "Lists all garages");
-
-        Command listSpecificGarage = new("listgaragecontents", "--name");
-
-        Command listGarageTypes = new("listgaragetypes", "Lists all garage types");
-        Command findCommand = new("find", "Finds the specified vehicle");
-        Command parkRandom = new("parkrandom", "Attempts to park a random vehicle");
+        Command demo = new("demo", "[Setup] Creates one garage of each type and populates each garage");
+        Command oneOfEachGarage = new("oneofeach", "[Setup] Creates one garage of each type");
+        Command autoPopulate = new("autopopulate", "[Setup] Autopopulates each garage");
+        Command createGarage = new("creategarage", "[Garage] Creates a new garage of the specified type");
+        Command listAllVehicles = new("listallvehicles", "[Vehicle] Lists all vehicles");
+        Command listAllGarages = new("listallgarages", "[Garage] Lists all garages");
+        Command listSpecificGarage = new("listgaragecontents", "[Garage] Lists all vehicles in the specified garage");
+        Command listGarageTypes = new("listgaragetypes", "[Garage] Lists all approved garage types");
+        Command findCommand = new("find", "[Vehicle] Finds vehicles matching the specified criteria");
+        Command parkRandom = new("parkrandom", "[Vehicle] Attempts to park a random vehicle");
+        Command unparkRandom = new("unparkrandom", "[Vehicle] Attempts to unpark a random vehicle");
+        Command unparkCommand = new("unpark", "[Vehicle] Unparks a vehicle by registration number");
+        Command parkCommand = new("park", "[Vehicle] Parks the specified vehicle");
+        Command exitCommand = new("exit", "[App] Exits the application");
 
 
-        Command unparkRandom = new("unparkrandom", "attempts to unpark a random vehicle");
-        Command unparkCommand = new("unpark", "--regnum" +
-            "\n example: unpark --regnum 123-ABC");
-        Command parkCommand = new("park", "Parks the specified vehicle");
+        // Garage options
+        Option<string[]> garageNameOption = new("--garagename") { HelpName = "Garage name", Required = true, Arity = ArgumentArity.OneOrMore, AllowMultipleArgumentsPerToken = true };
+        Option<string> garageTypeOption = new("--type") { HelpName = "Garage type", Required = true };
+        Option<int> garageSizeOption = new("--size") { HelpName = "Garage size", Required = true };
 
-        Command exitCommand = new("exit");
-
-
-        Option<string[]> createGarageNameOption = new Option<string[]>("--name") { HelpName = "Garage Name", Required = true, Arity = ArgumentArity.OneOrMore, AllowMultipleArgumentsPerToken = true };
-
-        Option<string> createGarageTypeOption = new Option<string>("--type") { HelpName = "Garage Type", Required = true };
-        Option<int> createGarageSizeOption = new Option<int>("--size") { HelpName = "Garage Size", Required = true };
-
-
-
-        Option<string> registryNumberOption = new Option<string>("--regnum") { HelpName = "platenumber", Required = false };
-        Option<int?> wheelsOption = new("--wheels") { HelpName = "Amount", Required = false };
-        Option<string> colorOption = new("--color") { HelpName = "Color", Required = false };
-        Option<string> vehicleTypeOption = new("--type") { HelpName = "Vehicletype", Required = false };
-        Option<string> fuelTypeOption = new("--fuel") { HelpName = "Fuel type", Required = false };
-        Option<string> uniqueOption = new("--unique") { HelpName = "Unique property", Required = false };
-
-
-        Option<string[]> parkNameOptionNonRequired = new Option<string[]>("--garagename") { HelpName = "garageID", Required = false, Arity = new ArgumentArity(1, 10) };
-        Option<string> parkRegistryNumberOption = new Option<string>("--regnum") { HelpName = "platenumber", Required = true };
-        Option<int> parkWheelsOption = new("--wheels") { HelpName = "Amount", Required = true };
+        // Park options (required)
+        Option<string> parkRegNumOption = new("--regnum") { HelpName = "Plate number", Required = true };
+        Option<int?> parkWheelsOption = new("--wheels") { HelpName = "Amount", Required = true };
         Option<string> parkColorOption = new("--color") { HelpName = "Color", Required = true };
-        Option<string> parkVehicleType = new("--type") { HelpName = "Vehicletype", Required = true };
-        Option<string> parkFuelType = new("--fuel") { HelpName = "Fuel type", Required = true };
-        Option<string> parkUniqueProperty = new("--unique") { HelpName = "Unique property", Required = true };
+        Option<string> parkTypeOption = new("--type") { HelpName = "Vehicle type", Required = true };
+        Option<string> parkFuelOption = new("--fuel") { HelpName = "Fuel type", Required = true };
+        Option<string> parkUniqueOption = new("--unique") { HelpName = "Unique", Required = true };
+        Option<string[]> parkGarageOption = new("--garagename") { HelpName = "Garage name", Required = false, Arity = new ArgumentArity(0, 10), AllowMultipleArgumentsPerToken = true };
+
+        // Find options (optional)
+        Option<string> findRegNumOption = new("--regnum") { HelpName = "Plate number", Required = false };
+        Option<int?> findWheelsOption = new("--wheels") { HelpName = "Amount", Required = false };
+        Option<string> findColorOption = new("--color") { HelpName = "Color", Required = false };
+        Option<string> findTypeOption = new("--type") { HelpName = "Vehicle type", Required = false };
+        Option<string> findFuelOption = new("--fuel") { HelpName = "Fuel type", Required = false };
+        Option<string> findUniqueOption = new("--unique") { HelpName = "Unique", Required = false };
+
+        // Unpark option
+        Option<string> unparkRegNumOption = new("--regnum") { HelpName = "Plate number", Required = true };
+
+        // List specific garage option
+        Option<string[]> listGarageNameOption = new("--garagename") { HelpName = "Garage name", Required = true, Arity = ArgumentArity.OneOrMore, AllowMultipleArgumentsPerToken = true };
+        Option<string[]> listSpecificGarageNameOption = new("--garagename") { HelpName = "Garage name", Required = true, Arity = ArgumentArity.OneOrMore, AllowMultipleArgumentsPerToken = true };
+
+
 
         void InitializeCommands()
         {
-            oneOfEachGarage.SetAction(p => logic.CreateOneOfEachGarage());
-            autoPopulate.SetAction(p => logic.Autopopulate());
 
-            listSpecificGarage.Add(createGarageNameOption);
-            listSpecificGarage.SetAction(p =>  logic.ListSpecificGarageContents(p.GetValue(createGarageNameOption)));
+            createGarage.Add(garageNameOption);
+            createGarage.Add(garageTypeOption);
+            createGarage.Add(garageSizeOption);
 
-            createGarage.Add(createGarageTypeOption);
-            createGarage.Add(createGarageSizeOption);
-            createGarage.Add(createGarageNameOption);
+            parkCommand.Add(parkRegNumOption);
+            parkCommand.Add(parkWheelsOption);
+            parkCommand.Add(parkColorOption);
+            parkCommand.Add(parkTypeOption);
+            parkCommand.Add(parkFuelOption);
+            parkCommand.Add(parkUniqueOption);
+            parkCommand.Add(parkGarageOption);
 
-            createGarage.SetAction(p =>
-            {
-                logic.CreateGarage(p.GetValue(createGarageTypeOption), p.GetValue(createGarageSizeOption), CreateGarageHelper(p, createGarageNameOption));
-            });
+            findCommand.Add(findRegNumOption);
+            findCommand.Add(findWheelsOption);
+            findCommand.Add(findColorOption);
+            findCommand.Add(findTypeOption);
+            findCommand.Add(findFuelOption);
+            findCommand.Add(findUniqueOption);
 
-            listAllGarages.SetAction(p => logic.ListAllGarages());
+            listSpecificGarage.Add(listSpecificGarageNameOption);
 
-            demo.SetAction(p => logic.Demo());
+            unparkCommand.Add(unparkRegNumOption);
 
-
-           // listSpecificGarage.SetAction(p => logic.ListSpecificGarage(CreateStringFromArrayHelper(p, garageNameOptionNonRequired)));
-
+            demo.SetAction(_ => logic.Demo());
+            oneOfEachGarage.SetAction(_ => logic.CreateOneOfEachGarage());
+            autoPopulate.SetAction(_ => logic.Autopopulate());
+            listAllGarages.SetAction(_ => logic.ListAllGarages());
+            parkRandom.SetAction(_ => logic.ParkRandom());
+            unparkRandom.SetAction(_ => logic.UnparkRandomVehicle());
+            exitCommand.SetAction(_ => logic.Exit());
             listAllVehicles.SetAction(_ => logic.ListAll());
             listGarageTypes.SetAction(_ => logic.ListApprovedVehicleTypes());
 
-            parkCommand.Add(parkRegistryNumberOption);
-            parkCommand.Add(parkVehicleType);
-            parkCommand.Add(parkFuelType);
-            parkCommand.Add(parkColorOption);
-            parkCommand.Add(parkWheelsOption);
-            parkCommand.Add(parkUniqueProperty);
-            parkCommand.Add(parkNameOptionNonRequired);
-
+            unparkCommand.SetAction(p => logic.Unpark(p.GetValue(unparkRegNumOption)!));
+            listSpecificGarage.SetAction(p => logic.ListSpecificGarageContents(p.GetValue(listSpecificGarageNameOption)));
+  
+            createGarage.SetAction(p =>
+            {
+                string? name = JoinArgs(p, garageNameOption);
+                logic.CreateGarage(p.GetValue(garageTypeOption), p.GetValue(garageSizeOption), name);
+            });
 
             parkCommand.SetAction(p =>
             {
-                string? reg = p.GetValue(parkRegistryNumberOption);
-                string? type = p.GetValue(parkVehicleType);
-                string? fuel = p.GetValue(parkFuelType);
-                string? color = p.GetValue(parkColorOption);
-                string? unique = p.GetValue(parkUniqueProperty);
-                int? wheels = p.GetValue(parkWheelsOption);
-                string? garageName = p.GetValue(parkNameOptionNonRequired) is string[] arr ? string.Join(" ", arr) : null;
-
-
-                if (!FilterFactory.TryCreate(requireAllFields: true, out Filter filter, out List<string> errors, reg, type, fuel, color, unique, wheels))
-                {
-                    logic.PrintErrors(errors);
-                    return;
-                }
-
-                logic.ParkVehicle(filter, garageName);
+                var filter = GetVehicleFilter(p, requireAll: true, parkRegNumOption, parkTypeOption, parkFuelOption, parkColorOption, parkUniqueOption, parkWheelsOption);
+                if (filter == null) return;
+                logic.ParkVehicle(filter, JoinArgs(p, parkGarageOption));
             });
-
-            findCommand.Add(registryNumberOption); findCommand.Add(vehicleTypeOption); findCommand.Add(wheelsOption); findCommand.Add(colorOption); findCommand.Add(fuelTypeOption); findCommand.Add(uniqueOption);
 
             findCommand.SetAction(p =>
             {
-                string? reg = p.GetValue(registryNumberOption);
-                string? type = p.GetValue(vehicleTypeOption);
-                string? fuel = p.GetValue(fuelTypeOption);
-                string? color = p.GetValue(colorOption);
-                string? unique = p.GetValue(uniqueOption);
-                int? wheels = p.GetValue(wheelsOption);
+                var filter = GetVehicleFilter(p, requireAll: false, findRegNumOption, findTypeOption, findFuelOption, findColorOption, findUniqueOption, findWheelsOption);
+                if (filter == null) return;
+                logic.Find(filter);
+            });
+            findCommand.SetAction(p =>
+            {
+                var reg = p.GetValue(findRegNumOption);
+                var type = p.GetValue(findTypeOption);
+                var fuel = p.GetValue(findFuelOption);
+                var color = p.GetValue(findColorOption);
+                var unique = p.GetValue(findUniqueOption);
+                var wheels = p.GetValue(findWheelsOption);
 
-                if (!FilterFactory.TryCreate(requireAllFields: false, out Filter filter, out List<string> errors, reg, type, fuel, color, unique, wheels))
+                if (reg == null && type == null && fuel == null && color == null && unique == null && wheels == null)
                 {
-                    logic.PrintErrors(errors);
+                    findCommand.Parse("--help").Invoke();
                     return;
                 }
 
+                var filter = GetVehicleFilter(p, requireAll: false, findRegNumOption, findTypeOption, findFuelOption, findColorOption, findUniqueOption, findWheelsOption);
+                if (filter == null) return;
                 logic.Find(filter);
             });
 
 
-
-            unparkCommand.Add(parkRegistryNumberOption);
-            unparkCommand.SetAction(p =>
-            {
-                string? registryNumber = p.GetValue(parkRegistryNumberOption);
-                if (registryNumber != null)
-                    logic.Unpark(registryNumber);
-            });
-
-
-            parkRandom.SetAction(p => logic.ParkRandom());
-            unparkRandom.SetAction(p => logic.UnparkRandomVehicle());
-
-            exitCommand.SetAction(p => logic.Exit());
-
-            //add the commands to the root command
-
             Root.Add(demo);
             Root.Add(oneOfEachGarage);
             Root.Add(autoPopulate);
+
             Root.Add(createGarage);
-            Root.Add(listAllVehicles);
             Root.Add(listAllGarages);
             Root.Add(listSpecificGarage);
             Root.Add(listGarageTypes);
+
+            Root.Add(listAllVehicles);
+            Root.Add(parkCommand);
             Root.Add(parkRandom);
+            Root.Add(unparkCommand);
             Root.Add(unparkRandom);
             Root.Add(findCommand);
-            Root.Add(unparkCommand);
-            Root.Add(parkCommand);
+
             Root.Add(exitCommand);
         }
+        private string? JoinArgs(ParseResult p, Option<string[]> option) =>
+    p.GetValue(option) is string[] arr ? string.Join(" ", arr) : null;
 
-        private string? CreateGarageHelper(ParseResult p, Option<string[]> garageNameOption)
+
+        private Filter? GetVehicleFilter(ParseResult p, bool requireAll,
+    Option<string> regNum, Option<string> type, Option<string> fuel,
+    Option<string> color, Option<string> unique, Option<int?> wheels)
         {
-
-            return (p.GetValue(garageNameOption) is string[] arr ? string.Join(" ", arr) : null);
-        }
-        private string? CreateStringFromArrayHelper(ParseResult p, Option<string[]> garageNameOption)
-        {
-            string[]? array = p.GetValue(garageNameOption);
-            string? mystring = (array is string[] arr ? string.Join(" ", arr) : null);
-
-            return mystring;
+            if (!FilterFactory.TryCreate(requireAll, out Filter filter, out List<string> errors,
+                p.GetValue(regNum), p.GetValue(type), p.GetValue(fuel),
+                p.GetValue(color), p.GetValue(unique), p.GetValue(wheels)))
+            {
+                logic.PrintErrors(errors);
+                return null;
+            }
+            return filter;
         }
     }
 }

@@ -4,7 +4,7 @@
     internal interface IGarage : IEnumerable<IVehicle>
     {
         public string GarageName { get; set; }
-        public int MaxSize { get; set; }
+        public int MaxSize { get; }
         public bool HasFreeSlots { get; }
         public int NumFreeSlots { get; }
 

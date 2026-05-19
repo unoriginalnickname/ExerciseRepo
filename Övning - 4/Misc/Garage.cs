@@ -3,16 +3,15 @@
 public class Garage<T> : IGarage where T : IVehicle
 {
     private List<T> internalGarage;
-    private readonly int defaultSize = 15;
     public Type TypeOfGarage { get; }
 
-    public int MaxSize { get; set; }
+    public int MaxSize { get; }
 
     public string GarageName { get; set; }
 
-    public bool HasFreeSlots { get { return MaxSize > internalGarage.Count(); } }
+    public bool HasFreeSlots { get { return MaxSize > internalGarage.Count; } }
 
-    public int NumFreeSlots => MaxSize - this.Count();
+    public int NumFreeSlots => MaxSize - internalGarage.Count;
 
     public Garage(int garageSize, string garageName)
     {
@@ -24,15 +23,7 @@ public class Garage<T> : IGarage where T : IVehicle
 
     public void ParkVehicle(IVehicle vehicle)
     {
-        try
-        {
-            internalGarage.Add((T)vehicle);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Garage: Could not park vehicle. ");
-            throw;
-        }
+        internalGarage.Add((T)vehicle);
     }
 
     public void Unpark(string registryNumber)

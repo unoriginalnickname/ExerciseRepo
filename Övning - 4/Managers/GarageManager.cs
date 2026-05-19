@@ -12,14 +12,11 @@ public class GarageManager
 
     private List<IGarage> garages = new();
 
-    Garage<IVehicle> backupGarage = new Garage<IVehicle>(400, "Backup garage 1");
-
     public void MakeNewGarage<T>(int size, string name) where T : IVehicle
     {
         garages.Add(new Garage<T>(size, name));
     }
     public readonly List<Type> AllGarageTypes = new() { 
-        typeof(Ufo), 
         typeof(Airplane), 
         typeof(Boat), 
         typeof(Bus), 
@@ -28,58 +25,50 @@ public class GarageManager
         typeof(Uap), 
         typeof(Ufo) };
 
-    public bool IsRegNumberDuplicate(string regNumber) => backupGarage.Any(v => v.RegistryNumber == regNumber);
+    public bool IsRegNumberDuplicate(string regNumber) =>
+    garages.Any(g => g.GetVehicles().Any(v => v.RegistryNumber == regNumber));
 
     //this comes from input, input is made into a filter, we might have a garagename
-    
+
     //parking
     public void TryParkVehicle(Filter filter, string? garageName)
     {
-        var garage = garages.Where(x => 
-        x.TypeOfGarage == Type.GetType(filter.VehicleType) 
+        var garage = garages.FirstOrDefault(x =>
+        x.TypeOfGarage == Type.GetType(filter.VehicleType)
         && x.HasFreeSlots
-         && (garageName == null || x.GarageName == garageName)).FirstOrDefault();
+        && (garageName == null || x.GarageName == garageName));
 
-        if(garage != null)
+        if (garage != null)
         {
             var vehicle = VehicleFactory.CreateVehicle(filter);
             garage.ParkVehicle(vehicle);
             ParkSuccessMessage(garage, vehicle);
         }
         else
-            Console.WriteLine("Could not find an available garage. ");
+            View.PrintString("Could not find an available garage. ");
 
-    }
-
-    private IGarage? FindMatchingGarageWithAvailableSlots(Type type)
-    {
-        throw new NotImplementedException();
     }
 
     //parkrandom
     public void ParkRandom()
     {
         if (!garages.Any())
-            View.PrintString("No garages found, need to create a garage"); //decision here is either to force making a garage or making a default garage.
-        //Type vehicleType = RandomHelper.Pick(AllGarageTypes);
-
-        IGarage garage = garages.Where(x => x.HasFreeSlots).FirstOrDefault();
-        if(garage != null)
         {
-            Type garageType = garage.TypeOfGarage;
-            if (garageType != null)
-            {
-
-                IVehicle vehicle = VehicleFactory.CreateRandomVehicle(garageType);
-
-                garage.ParkVehicle(vehicle);
-                ParkSuccessMessage(garage, vehicle);
-
-                return;
-            }
+            View.PrintString("No garages found, need to create a garage.");
+            return;
         }
 
-        View.PrintString("Could not park random. ");
+        var availableGarages = garages.Where(x => x.HasFreeSlots).ToList();
+        if (!availableGarages.Any())
+        {
+            View.PrintString("All garages are full.");
+            return;
+        }
+
+        var garage = RandomHelper.Pick(availableGarages);
+        var vehicle = VehicleFactory.CreateRandomVehicle(garage.TypeOfGarage);
+        garage.ParkVehicle(vehicle);
+        ParkSuccessMessage(garage, vehicle);
     }
 
     private static void ParkSuccessMessage(IGarage garage, IVehicle vehicle)
@@ -91,8 +80,16 @@ public class GarageManager
 
     public void Unpark(string regNumber)
     {
-        backupGarage.Unpark(regNumber);
-        View.PrintString("Unparked: ");
+        var garage = garages.FirstOrDefault(x => x.GetVehicles().Any(v => v.RegistryNumber == regNumber));
+
+        if (garage == null)
+        {
+            View.PrintString($"No vehicle with reg number '{regNumber}' found.");
+            return;
+        }
+
+        garage.Unpark(regNumber);
+        View.PrintString($"Unparked: {regNumber} from {garage.GarageName}");
     }
 
     public void UnparkRandomVehicle()
@@ -121,7 +118,7 @@ public class GarageManager
         foreach (IGarage garage in garages)
         {
             var filterList = garage
-               .Where(v => Matches(v, f)).Select(ConvertVehicleToFilter).ToList();
+               .Where(v => Matches(v, f)).Select(FilterFactory.ConvertVehicleToFilter).ToList();
                 if(filterList.Count > 0)
             tupleList.Add((filterList, garage.GarageName));
         }
@@ -134,7 +131,7 @@ public class GarageManager
             }
         }
     }
-    private void ListVehicles()
+    public void ListAllVehicles()
     {
         if (!garages.Any())
         {
@@ -154,13 +151,13 @@ public class GarageManager
         {
             foreach (var item in garage.GetVehicles())
             {
-                Filter filter = ConvertVehicleToFilter(item);
+                Filter filter = FilterFactory.ConvertVehicleToFilter(item);
                 View.PrintString(filter.ToString());
             }
         }
     }
 
-    public void ListAll() => ListVehicles();
+
 
     public void Find(Filter filter) => ListVehicles(filter);
 
@@ -179,29 +176,18 @@ public class GarageManager
         (f.VehicleType == null || v.GetType().Name.Equals(f.VehicleType, StringComparison.OrdinalIgnoreCase)) &&
         (f.FuelType == null || v.FuelType.ToString().Equals(f.FuelType, StringComparison.OrdinalIgnoreCase));
 
-    private Filter ConvertVehicleToFilter(IVehicle v) => new Filter
-    {
-        VehicleType = v.GetType().Name,
-        RegistryNumber = v.RegistryNumber,
-        Color = v.Color,
-        NumWheels = v.NumWheels,
-        FuelType = v.FuelType,
-        UniquePropertyValue = v.UniquePropertyValue,
-        UniquePropertyString = v.UniquePropertyString
-    };
 
     internal bool ListSpecificGarage(string? garageName)
     {
         if (garageName is null)
             return false;
 
-        var garage = garages.Where(x => x.GarageName == garageName).Select(x => x).FirstOrDefault();
-        if(garage != null)
+        var garage = garages.FirstOrDefault(x => x.GarageName == garageName);
+        if (garage != null)
         {
-            List<Filter> viewConvertedVehicles = new List<Filter>();
-
-            foreach (var item in garage)
-                viewConvertedVehicles.Add(FilterFactory.ConvertVehicleToFilter((IVehicle)item));
+            var viewConvertedVehicles = garage
+                    .Select(item => FilterFactory.ConvertVehicleToFilter((IVehicle)item))
+                    .ToList();
 
             View.PrintGarage(viewConvertedVehicles, garage.ToString());
             return true;
@@ -252,47 +238,34 @@ public class GarageManager
     }
     internal void CreateGarage(string? garageTypeName, int? garageSize, string? garageName)
     {
-
         string? correctedTypeName = NormalizeWord(garageTypeName);
 
-        // fix toupper and fix capitalization here
-        var type = Type.GetType(correctedTypeName); // e.g. "MyNamespace.Car"
+        if (correctedTypeName == null)
+        {
+            View.PrintString("Garage type name cannot be empty.");
+            return;
+        }
 
-        var actualGarageType = typeof(Garage<>).MakeGenericType(type); //crashes here
+        var type = Type.GetType(correctedTypeName)
+            ?? throw new ArgumentException($"Unknown vehicle type '{correctedTypeName}'");
 
-        var garage = (IGarage)Activator.CreateInstance(actualGarageType, garageSize ?? 55, garageName ?? "default name");
+        if (!typeof(IVehicle).IsAssignableFrom(type))
+        {
+            View.PrintString($"'{correctedTypeName}' is not a valid vehicle type.");
+            return;
+        }
+
+        var actualGarageType = typeof(Garage<>).MakeGenericType(type);
+        var garage = (IGarage)Activator.CreateInstance(actualGarageType, garageSize ?? 55, garageName ?? "Default Garage");
 
         garages.Add(garage);
         View.PrintString("Garage was added. " + garage.ToString());
     }
 
-    internal IEnumerable<string> GetGarageStrings()
-    {
-        List<string> garageStrings = new List<string>();
-
-        foreach (var item in garages)
-        {
-            garageStrings.Add(item.ToString());
-        }
-
-        return garageStrings;
-    }
- 
+    internal IEnumerable<string> GetGarageStrings() => garages.Select(g => g.ToString());
     internal void ListAllGarages()
     {
-        //car is just to get access to header inside garage.
         View.PrintString(Garage<Car>.Header());
         View.PrintIEnumerable(GetGarageStrings());
     }
-
-    //internal IEnumerable<string> GetAllGarageNames()
-    //{
-    //    List<string> garageNames = new List<string>();
-
-    //    foreach (var garage in garages)
-    //    {
-
-
-    //    }
-    //}
 }
