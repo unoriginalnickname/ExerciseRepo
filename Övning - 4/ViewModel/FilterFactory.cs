@@ -1,15 +1,28 @@
+using Övning___4.Misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GaragePractice
+namespace Övning___4.ViewModel
 {
     public static class FilterFactory
     {
         private const int MinWheels = 0;
         private const int MaxWheels = 18;
 
-        public static bool TryCreate(string? reg, string? type, string? fuel, string? color, string? unique, int? wheels, bool requireAllFields, out Filter filter, out List<string> errors)
+        public static Filter ConvertVehicleToFilter(IVehicle v) => new Filter
+        {
+            VehicleType = v.GetType().Name,
+            RegistryNumber = v.RegistryNumber,
+            Color = v.Color,
+            NumWheels = v.NumWheels,
+            FuelType = v.FuelType,
+            UniquePropertyValue = v.UniquePropertyValue,
+            UniquePropertyString = v.UniquePropertyString
+        };
+
+    
+        public static bool TryCreate(bool requireAllFields, out Filter filter, out List<string> errors, string? reg = null, string? type = null, string? fuel = null, string? color = null, string? unique = null, int? wheels = null)
         {
             errors = new List<string>();
 

@@ -1,9 +1,9 @@
-﻿using GaragePractice;
+﻿using Övning___4.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 
-namespace Övning___4
+namespace Övning___4.Misc
 {
     public static class VehicleFactory
     {
@@ -18,32 +18,47 @@ namespace Övning___4
     { "Ufo", () => new Ufo() },
     { "Uap", () => new Uap() }
 };
+        private static Dictionary<Type, string> uniquePropertyStrings = new()
+{
+    { typeof(Airplane),   "Wingspan" },
+    { typeof(Boat),       "Length" },
+    { typeof(Bus),        "Stops" },
+    { typeof(Car),        "Doors" },
+    { typeof(Motorcycle), "Engine" },
+    { typeof(Ufo),        "Abductees" },
+    { typeof(Uap),        "Details" }
+};
 
-        private static Dictionary<Type, Func<string>> uniquePropertyValueGenerators = new()
+        private static Dictionary<Type, Func<string>> uniquePropertyValue = new()
 {
     { typeof(Airplane),   () => $"{Random.Shared.Next(10, 80)} m" },
     { typeof(Boat),       () => $"{Random.Shared.Next(5, 200)} m" },
-    { typeof(Bus),        () => $"{Random.Shared.Next(10, 200)} stops" },
-    { typeof(Car),        () => $"{Random.Shared.Next(2, 6)} doors" },
+    { typeof(Bus),        () => $"{Random.Shared.Next(10, 200)}" },
+    { typeof(Car),        () => $"{Random.Shared.Next(2, 6)}" },
     { typeof(Motorcycle), () => $"{Random.Shared.Next(50, 1500)} cc" },
-    { typeof(Ufo),        () => $"{Random.Shared.Next(1, 1000)} abductees" },
+    { typeof(Ufo),        () => $"{Random.Shared.Next(1, 1000)}" },
     { typeof(Uap),        () => "Classified" }
 };
 
+
+
         public static IVehicle CreateVehicle(Filter filter)
         {
-            if (!VehicleCreators.TryGetValue(filter.VehicleType, out var factory))
-                throw new ArgumentException($"Vehicle type '{filter.VehicleType}' is not approved.");
+            var vehicleType = Type.GetType(filter.VehicleType)
+                ?? throw new ArgumentException($"Unknown vehicle type '{filter.VehicleType}'");
 
-            var vehicle = factory();
+            var vehicle = (IVehicle)(Activator.CreateInstance(vehicleType)
+                ?? throw new ArgumentException($"Could not create vehicle of type '{filter.VehicleType}'"));
+
             vehicle.RegistryNumber = filter.RegistryNumber ?? throw new ArgumentException("RegNumber is required");
             vehicle.FuelType = filter.FuelType ?? throw new ArgumentException("FuelType is required");
-            vehicle.Color = filter.Color ?? "Unknown";
             vehicle.NumWheels = filter.NumWheels ?? throw new ArgumentException("NumWheels is required");
-            vehicle.UniquePropertyValue = filter.UniquePropertyValue ?? "Unknown";
+            vehicle.Color = filter.Color ?? "Unknown";
+            vehicle.UniquePropertyValue = filter.UniquePropertyValue ?? uniquePropertyValue[vehicleType]();
+            vehicle.UniquePropertyString = filter.UniquePropertyString ?? uniquePropertyStrings[vehicleType];
             return vehicle;
         }
-        
+
         public static IVehicle CreateRandomVehicle(Type type)
         {
             try
@@ -65,7 +80,8 @@ namespace Övning___4
                     Color = RandomHelper.Pick(new List<string> { "Red", "Blue", "Black", "White", "Green", "Orange", "Magenta", "Chrome" }),
                     FuelType = RandomHelper.Pick(new List<string> { "Petrol", "Diesel", "Electric", "Hybrid" }),
                     NumWheels = RandomHelper.Pick(new List<int> { 2, 4, 6, 8 }),
-                    UniquePropertyValue = uniquePropertyValueGenerators[vehicleType]()
+                    UniquePropertyValue = uniquePropertyValue[vehicleType](),
+                    UniquePropertyString = uniquePropertyStrings[vehicleType]
                 };
 
                 return CreateVehicle(filter);

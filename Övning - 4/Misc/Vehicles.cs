@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Övning___4.Misc;
 
-namespace GaragePractice
-{
 
     public class Airplane : IVehicle
     {
@@ -69,4 +65,4 @@ namespace GaragePractice
         public string UniquePropertyValue { get; set; }
         public string UniquePropertyString { get; set; }
     }
-}
+

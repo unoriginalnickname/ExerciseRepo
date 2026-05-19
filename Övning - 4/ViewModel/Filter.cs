@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.FileIO;
+using Övning___4.Misc;
 
-namespace GaragePractice
+namespace Övning___4.ViewModel
 {
     public class Filter
     {
@@ -20,6 +21,20 @@ namespace GaragePractice
                 $"{NumWheels,-6}" +
                 $"{FuelType,-10}" +
                 $"{UniquePropertyString}: {UniquePropertyValue}";
+        }
+        public static string Header()
+        {
+            return
+                $"{"Type",-13}" +
+                $"{"RegNumber",-10}" +
+                $"{"Color",-8}" +
+                $"{"Wheels",-6}" +
+                $"{"Fuel",-10}" +
+                $"{"Details"}";
+        }
+        internal IVehicle ToVehicle()
+        {
+           return VehicleFactory.CreateVehicle(this);
         }
     }
 }

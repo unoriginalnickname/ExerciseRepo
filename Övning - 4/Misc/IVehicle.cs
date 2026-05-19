@@ -1,5 +1,4 @@
-﻿namespace GaragePractice
-{
+﻿
     public interface IVehicle
     {
         public string RegistryNumber { get; set; }
@@ -10,4 +9,3 @@
         public string UniquePropertyString { get; set; }
     }
 
-}

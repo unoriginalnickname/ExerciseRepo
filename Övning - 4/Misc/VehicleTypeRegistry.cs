@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Övning___4
+namespace Övning___4.Misc
 {
     static class VehicleTypeRegistry
     {
