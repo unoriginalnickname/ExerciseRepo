@@ -29,8 +29,14 @@ namespace Övning___4.Commands
         Command parkRandom = new("parkrandom", "[Vehicle] Attempts to park a random vehicle");
         Command unparkRandom = new("unparkrandom", "[Vehicle] Attempts to unpark a random vehicle");
         Command unparkCommand = new("unpark", "[Vehicle] Unparks a vehicle by registration number");
+      
+       // Command parkHelper = new("parkhelper", "[Vehicle] Pre-fills the park command for you to complete");
+       
         Command parkCommand = new("park", "[Vehicle] Parks the specified vehicle");
         Command exitCommand = new("exit", "[App] Exits the application");
+      
+
+
 
 
         // Garage options
@@ -59,7 +65,6 @@ namespace Övning___4.Commands
         Option<string> unparkRegNumOption = new("--regnum") { HelpName = "Plate number", Required = true };
 
         // List specific garage option
-        Option<string[]> listGarageNameOption = new("--garagename") { HelpName = "Garage name", Required = true, Arity = ArgumentArity.OneOrMore, AllowMultipleArgumentsPerToken = true };
         Option<string[]> listSpecificGarageNameOption = new("--garagename") { HelpName = "Garage name", Required = true, Arity = ArgumentArity.OneOrMore, AllowMultipleArgumentsPerToken = true };
 
 
@@ -102,7 +107,15 @@ namespace Övning___4.Commands
 
             unparkCommand.SetAction(p => logic.Unpark(p.GetValue(unparkRegNumOption)!));
             listSpecificGarage.SetAction(p => logic.ListSpecificGarageContents(p.GetValue(listSpecificGarageNameOption)));
-  
+
+
+            //parkHelper.SetAction(_ =>
+            //{
+            //    string input = ReadLine.Read("> ", "park --regnum  --type  --color  --wheels  --fuel  --unique ");
+            //    ReadLine.AddHistory(input);
+            //    Root.Parse(input.Split()).Invoke();
+            //});
+
             createGarage.SetAction(p =>
             {
                 string? name = JoinArgs(p, garageNameOption);
@@ -122,25 +135,6 @@ namespace Övning___4.Commands
                 if (filter == null) return;
                 logic.Find(filter);
             });
-            findCommand.SetAction(p =>
-            {
-                var reg = p.GetValue(findRegNumOption);
-                var type = p.GetValue(findTypeOption);
-                var fuel = p.GetValue(findFuelOption);
-                var color = p.GetValue(findColorOption);
-                var unique = p.GetValue(findUniqueOption);
-                var wheels = p.GetValue(findWheelsOption);
-
-                if (reg == null && type == null && fuel == null && color == null && unique == null && wheels == null)
-                {
-                    findCommand.Parse("--help").Invoke();
-                    return;
-                }
-
-                var filter = GetVehicleFilter(p, requireAll: false, findRegNumOption, findTypeOption, findFuelOption, findColorOption, findUniqueOption, findWheelsOption);
-                if (filter == null) return;
-                logic.Find(filter);
-            });
 
 
             Root.Add(demo);
@@ -153,6 +147,7 @@ namespace Övning___4.Commands
             Root.Add(listGarageTypes);
 
             Root.Add(listAllVehicles);
+            //Root.Add(parkHelper);
             Root.Add(parkCommand);
             Root.Add(parkRandom);
             Root.Add(unparkCommand);

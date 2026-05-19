@@ -5,10 +5,7 @@ using System.Text;
 
 public class GarageManager
 {
-    public GarageManager()
-    {
 
-    }
 
     private List<IGarage> garages = new();
 
@@ -33,10 +30,17 @@ public class GarageManager
     //parking
     public void TryParkVehicle(Filter filter, string? garageName)
     {
+        var vehicleType = Type.GetType(filter.VehicleType);
+        if (vehicleType == null)
+        {
+            View.PrintString($"Unknown vehicle type '{filter.VehicleType}'. Use 'listgaragetypes' to see approved types.");
+            return;
+        }
+
         var garage = garages.FirstOrDefault(x =>
-        x.TypeOfGarage == Type.GetType(filter.VehicleType)
-        && x.HasFreeSlots
-        && (garageName == null || x.GarageName == garageName));
+            x.TypeOfGarage == vehicleType
+            && x.HasFreeSlots
+            && (garageName == null || x.GarageName == garageName));
 
         if (garage != null)
         {
@@ -45,8 +49,7 @@ public class GarageManager
             ParkSuccessMessage(garage, vehicle);
         }
         else
-            View.PrintString("Could not find an available garage. ");
-
+            View.PrintString("Could not find an available garage.");
     }
 
     //parkrandom
@@ -230,6 +233,7 @@ public class GarageManager
         garages.Add(new Garage<Motorcycle>(3, "Motorcycle Garage 1"));
         garages.Add(new Garage<Uap>(2, "Classified 1"));
         garages.Add(new Garage<Ufo>(2, "Classified 2"));
+        View.PrintString("One of each garage was created");
     }
     string? NormalizeWord(string? s)
     {

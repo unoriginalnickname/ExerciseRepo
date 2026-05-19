@@ -20,8 +20,9 @@ public class CommandRouter
         root.Parse("--help").Invoke();
         while (run)
         {
-            var input = View.GetInput().Split();
-            root.Parse(input).Invoke();
+            string input = ReadLine.Read("> ");
+            ReadLine.AddHistory(input);
+            root.Parse(input.Split()).Invoke();
         }
     }
 
