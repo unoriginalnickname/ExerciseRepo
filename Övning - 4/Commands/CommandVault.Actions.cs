@@ -10,7 +10,7 @@ namespace Övning___4.Commands
     {
         private void OnPark(ParseResult p)
         {
-            var filter = GetVehicleFilter(p, requireAll: true, parkRegNumOption, parkTypeOption, parkFuelOption, parkColorOption, parkUniqueOption, parkWheelsOption);
+            var filter = GetVehicleFilter(p, parkRegNumOption, parkTypeOption, parkFuelOption, parkColorOption, parkUniqueOption, parkWheelsOption);
             if (filter == null) return;
             logic.ParkVehicle(filter, JoinArgs(p, parkGarageOption));
         }
@@ -30,7 +30,7 @@ namespace Övning___4.Commands
                 return;
             }
 
-            var filter = GetVehicleFilter(p, requireAll: false, findRegNumOption, findTypeOption, findFuelOption, findColorOption, findUniqueOption, findWheelsOption);
+            var filter = GetVehicleFilter(p, findRegNumOption, findTypeOption, findFuelOption, findColorOption, findUniqueOption, findWheelsOption);
             if (filter == null) return;
             logic.Find(filter);
         }
