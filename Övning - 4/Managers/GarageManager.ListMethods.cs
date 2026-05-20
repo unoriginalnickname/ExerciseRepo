@@ -1,81 +1,76 @@
 ﻿using Övning___4.Misc;
-using Övning___4.View;
 using Övning___4.ViewModel;
 using System.Text;
 
-    public partial class GarageManager
+public partial class GarageManager
+{
+    internal OperationResult ListAllGarages()
     {
-    internal void ListAllGarages()
-    {
-        View.PrintString(IGarage.Header());
-        View.PrintIEnumerable(GetGarageStrings());
+        IEnumerable<string> garages = GetGarageStrings();
+        if (!garages.Any())
+            return OperationResult.Fail("No garages exist.");
+
+        return OperationResult.Ok(IGarage.Header() + "\n"+ string.Join("\n", GetGarageStrings()));
     }
-    public void Find(Filter filter) => ListVehicles(filter);
-    public void ListApprovedVehicleTypes()
+    public OperationResult ListApprovedVehicleTypes()
     {
         var sb = new StringBuilder("\nApproved vehicle types:\n");
         foreach (var kv in VehicleTypeRegistry.ApprovedVehicleTypes)
             sb.AppendLine($"{kv.Key}, unique: {kv.Value}");
-        View.PrintString(sb.ToString());
+       return OperationResult.Ok (sb.ToString());
     }
 
-    private void ListVehicles(Filter f)
+    public OperationResult ListVehicles(Filter f)
+    {
+       // var results = garages.Select(x => x.Where(v => Matches(v, f)).Select(FilterFactory.ConvertVehicleToFilter).ToList());
+
+        var results = garages
+            .Select(g => (
+                Matches: g.Where(v => Matches(v, f)).Select(FilterFactory.ConvertVehicleToFilter).ToList(),
+                g.GarageName))
+            .Where(x => x.Matches.Count > 0)
+            .ToList();
+
+        if (!results.Any())
+            return OperationResult.Fail($"No vehicles found matching criteria.");
+
+        StringBuilder sb = new StringBuilder();
+        foreach (var (matches, garageName) in results)
         {
-            var results = garages
-                .Select(g => (
-                    Matches: g.Where(v => Matches(v, f)).Select(FilterFactory.ConvertVehicleToFilter).ToList(),
-                    g.GarageName))
-                .Where(x => x.Matches.Count > 0)
-                .ToList();
-
-            if (!results.Any())
-            {
-                View.PrintString($"No vehicles found matching criteria.");
-                return;
-            }
-
-            foreach (var (matches, garageName) in results)
-            {
-                View.PrintString($"\nFound: {matches.Count} in: {garageName}:\n");
-                matches.ForEach(f => View.PrintString(f.ToString()));
-            }
+            sb.Append($"\nFound:{matches.Count} in \"{garageName}\":\n");
+            matches.ForEach(f => sb.Append(f.ToString() + "\n"));
         }
-        public void ListAllVehicles()
-        {
-            if (!garages.Any())
-            {
-                View.PrintString("No garages exist");
-                return;
-            }
 
-            var vehicles = GetAllVehicles();
-            if (!vehicles.Any())
-            {
-                View.PrintString("Garages are empty");
-                return;
-            }
+        return OperationResult.Ok(sb.ToString());
+    }
 
-            View.PrintString(Filter.Header());
-            foreach (var vehicle in vehicles)
-                View.PrintString(FilterFactory.ConvertVehicleToFilter(vehicle).ToString());
-        }
-    internal bool ListSpecificGarage(string? garageName)
+    public OperationResult ListAllVehicles()
+    {
+        if (!garages.Any())
+            return OperationResult.Fail("No garages exist");
+
+        var vehicles = GetAllVehicles();
+        if (!vehicles.Any())
+            return OperationResult.Fail("Garages are empty");
+
+        var lines = vehicles.Select(v => FilterFactory.ConvertVehicleToFilter(v).ToString());
+        return OperationResult.Ok(Filter.Header() + "\n" + string.Join("\n", lines));
+    }
+
+    internal OperationResult ListSpecificGarage(string? garageName)
     {
         if (garageName is null)
-            return false;
+            return OperationResult.Fail("No garagename provided");
 
-        var garage = garages.FirstOrDefault(x => x.GarageName == garageName);
+        var garage = FindGarageWithName(garageName);
         if (garage != null)
         {
             var viewConvertedVehicles = garage
                     .Select(FilterFactory.ConvertVehicleToFilter)
                     .ToList();
-
-            View.PrintGarage(viewConvertedVehicles, garage.ToString());
-            return true;
+       
+           return OperationResult.Ok(string.Join("\n", viewConvertedVehicles), garage.ToString());
         }
-        View.PrintString("Garage wasn't found");
-        return false;
+        return OperationResult.Fail("Garage wasn't found");
     }
 }
-

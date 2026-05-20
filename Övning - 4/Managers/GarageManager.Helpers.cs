@@ -21,6 +21,14 @@ public partial class GarageManager
         if (string.IsNullOrWhiteSpace(s)) return null;
         return char.ToUpperInvariant(s![0]) + s.Substring(1).ToLowerInvariant();
     }
+    private IGarage FindGarageContaining(string regNumber)
+    {
+        return garages.FirstOrDefault(g => g.ContainsVehicleRegNumber(regNumber));
+    }
+    private IGarage FindGarageWithName(string garageName)
+    {
+        return garages.FirstOrDefault(x => x.GarageName == garageName);
+    }
 
     internal IEnumerable<string> GetGarageStrings() => garages.Select(g => g.ToString());
 }

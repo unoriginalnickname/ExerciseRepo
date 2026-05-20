@@ -1,8 +1,7 @@
 ﻿using Övning___4.ViewModel;
-using System;
-using System.Collections.Generic;
+using Övning___4.View;
 using System.CommandLine;
-using System.Text;
+
 
 namespace Övning___4.Commands
 {
@@ -20,7 +19,7 @@ p.GetValue(option) is string[] arr ? string.Join(" ", arr) : null;
                 p.GetValue(regNum), p.GetValue(type), p.GetValue(fuel),
                 p.GetValue(color), p.GetValue(unique), p.GetValue(wheels)))
             {
-                logic.PrintErrors(errors);
+                View.View.PrintString(string.Join("\n", errors));
                 return null;
             }
             return filter;

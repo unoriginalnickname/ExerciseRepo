@@ -25,17 +25,19 @@ namespace Övning___4.Commands
         Command listSpecificGarage = new("listgaragecontents", "[Garage] Lists all vehicles in the specified garage");
         Command listGarageTypes = new("listgaragetypes", "[Garage] Lists all approved garage types");
         Command findCommand = new("find", "[Vehicle] Finds vehicles matching the specified criteria");
+        
         Command parkRandom = new("parkrandom", "[Vehicle] Attempts to park a random vehicle");
+        
         Command unparkRandom = new("unparkrandom", "[Vehicle] Attempts to unpark a random vehicle");
         Command unparkCommand = new("unpark", "[Vehicle] Unparks a vehicle by registration number");
         Command parkCommand = new("park", "[Vehicle] Parks the specified vehicle");
         Command exitCommand = new("exit", "[App] Exits the application");
-      
+
 
         void InitializeCommands()
         {
 
-            createGarage.Add(new Option<string>("--regnum") { HelpName = "Plate number", Required = false });
+            createGarage.Add(garageNameOption);
             createGarage.Add(garageTypeOption);
             createGarage.Add(garageSizeOption);
 
@@ -54,11 +56,12 @@ namespace Övning___4.Commands
             findCommand.Add(findFuelOption);
             findCommand.Add(findUniqueOption);
 
+
             listSpecificGarage.Add(listSpecificGarageNameOption);
 
             unparkCommand.Add(unparkRegNumOption);
 
-            demo.SetAction(_ => logic.Demo());
+            demo.SetAction(_ => { logic.CreateOneOfEachGarage(); logic.Autopopulate(); } )  ;
             oneOfEachGarage.SetAction(_ => logic.CreateOneOfEachGarage());
             autoPopulate.SetAction(_ => logic.Autopopulate());
             listAllGarages.SetAction(_ => logic.ListAllGarages());

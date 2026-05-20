@@ -14,6 +14,7 @@
 
         public Type TypeOfGarage { get; }
         public void ParkVehicle(IVehicle vehicle);
+        public bool ContainsVehicleRegNumber(string regNumber);
 
         public void Unpark(string registryNumber);
 

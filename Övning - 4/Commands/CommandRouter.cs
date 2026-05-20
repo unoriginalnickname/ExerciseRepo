@@ -26,23 +26,35 @@ public class CommandRouter
         }
     }
 
+    private void Handle(OperationResult result) => View.PrintString(result.Message);
+
+    public void ParkRandom() => Handle(garageManager.ParkRandom());
+    public void UnparkRandomVehicle() => Handle(garageManager.UnparkRandomVehicle());
+    internal void CreateOneOfEachGarage() => Handle(garageManager.CreateOneOfEachGarage());
+    internal void Autopopulate() => Handle(garageManager.AutoPopulateGarages());
+    
+
+    
+
+
+    public void ListAll() => Handle(garageManager.ListAllVehicles());
     internal void Exit() => run = false;
 
-    public void PrintErrors(IEnumerable<string> error) => View.PrintIEnumerable(error);
+   
+    public void ListApprovedVehicleTypes() => Handle(garageManager.ListApprovedVehicleTypes());
+ 
 
-    public void ParkVehicle(Filter filter, string? garageName) => garageManager.TryParkVehicle(filter, garageName);
-    public void Unpark(string regNumber) => garageManager.Unpark(regNumber);
-    public void ParkRandom() => garageManager.ParkRandom();
-    public void UnparkRandomVehicle() => garageManager.UnparkRandomVehicle();
-    public void ListAll() => garageManager.ListAllVehicles();
-    public void Find(Filter filter) => garageManager.Find(filter);
-    public void ListApprovedVehicleTypes() => garageManager.ListApprovedVehicleTypes();
-    internal void ListSpecificGarage(string? v) => garageManager.ListSpecificGarage(v);
-    internal void Demo() => garageManager.Demo();
-    internal void ListAllGarages() => garageManager.ListAllGarages();
-    internal void CreateGarage(string? garageType, int? garageSize, string? garageName) => garageManager.CreateGarage(garageType, garageSize, garageName);
+    internal void ListAllGarages() => Handle(garageManager.ListAllGarages());
 
-    internal void ListSpecificGarageContents(string[]? strings) => garageManager.ListSpecificGarage(string.Join(" ", strings));
-    internal void CreateOneOfEachGarage() => garageManager.CreateOneOfEachGarage();
-    internal void Autopopulate() => garageManager.AutoPopulateGarages();
+    public void Unpark(string regNumber) => Handle(garageManager.Unpark(regNumber)); // has input verification
+
+    public void ParkVehicle(Filter filter, string? garageName) => Handle(garageManager.TryParkVehicle(filter, garageName));
+
+    public void Find(Filter filter) => Handle(garageManager.ListVehicles(filter));
+
+    internal void ListSpecificGarage(string? v) => Handle(garageManager.ListSpecificGarage(v));
+    internal void CreateGarage(string? garageType, int? garageSize, string? garageName) => Handle(garageManager.CreateGarage(garageType, garageSize, garageName));
+
+    internal void ListSpecificGarageContents(string[]? strings) => Handle(garageManager.ListSpecificGarage(string.Join(" ", strings)));
+
 }
