@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GaragePractice
 {
-    public abstract class Vehicle
+    interface IVehicle
     {
         public string RegistryNumber { get; set; }
         public string Color { get; set; }
@@ -14,13 +14,5 @@ namespace GaragePractice
         public abstract void SetUniqueProperty(string property);
         public abstract string GetUniquePropertyString();
         public abstract string GetUniqueProperty();
-        public Vehicle(string regPlate = "", string color = "", string numWheels = "", string fuel = "", string other = "")
-        {
-            RegistryNumber = regPlate;
-            Color = color;
-            NumWheels = numWheels;
-            Fueltype = fuel;
-            Other = other;
-        }
     }
 }
