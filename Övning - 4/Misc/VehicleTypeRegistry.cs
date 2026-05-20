@@ -17,6 +17,15 @@ namespace Övning___4.Misc
     { "Uap", "Classified" },
  };
 
+        public static readonly List<Type> AllGarageTypes = new() {
+        typeof(Airplane),
+        typeof(Boat),
+        typeof(Bus),
+        typeof(Car),
+        typeof(Motorcycle),
+        typeof(Uap),
+        typeof(Ufo) };
+
         public static Dictionary<string, string> ApprovedVehicleTypes { get { return approvedVehicleTypes; } }
 
     }

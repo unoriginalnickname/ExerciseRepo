@@ -3,7 +3,11 @@
 
     internal interface IGarage : IEnumerable<IVehicle>
     {
-        public string GarageName { get; set; }
+    public static string Header()
+    {
+        return $"{"Type",-20}{"Name",-25}{"Space"}";
+    }
+    public string GarageName { get; set; }
         public int MaxSize { get; }
         public bool HasFreeSlots { get; }
         public int NumFreeSlots { get; }

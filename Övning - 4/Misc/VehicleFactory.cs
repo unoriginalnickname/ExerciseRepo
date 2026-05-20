@@ -7,6 +7,7 @@ namespace Övning___4.Misc
 {
     public static class VehicleFactory
     {
+
         private static Dictionary<Type, string> uniquePropertyStrings = new()
 {
     { typeof(Airplane),   "Wingspan" },
