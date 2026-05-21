@@ -14,11 +14,10 @@ p.GetValue(option) is string[] arr ? string.Join(" ", arr) : null;
     Option<string> regNum, Option<string> type, Option<string> fuel,
     Option<string> color, Option<string> unique, Option<int?> wheels)
         {
-            if (!FilterFactory.TryCreate(out Filter filter, out List<string> errors,
+            if (!FilterFactory.TryCreate(out Filter filter,
                 p.GetValue(regNum), p.GetValue(type), p.GetValue(fuel),
-                p.GetValue(color), p.GetValue(unique), p.GetValue(wheels)))
+                p.GetValue(color), p.GetValue(unique), p.GetValue(wheels)).Success)
             {
-                View.View.PrintString(string.Join("\n", errors));
                 return null;
             }
             return filter;

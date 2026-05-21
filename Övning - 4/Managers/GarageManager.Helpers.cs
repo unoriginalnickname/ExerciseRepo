@@ -3,6 +3,8 @@
 
 public partial class GarageManager
 {
+    private bool RegNumberExistsAnywhere(string regNumber) =>
+    garages.Any(g => g.ContainsVehicleRegNumber(regNumber));
     private bool Matches(IVehicle v, Filter f) =>
         (f.RegistryNumber == null || v.RegistryNumber.Equals(f.RegistryNumber, StringComparison.OrdinalIgnoreCase)) &&
         (f.NumWheels == null || v.NumWheels == f.NumWheels) &&
@@ -24,7 +26,7 @@ public partial class GarageManager
     }
     private IGarage FindGarageWithName(string garageName)
     {
-        return garages.FirstOrDefault(x => x.GarageName == garageName);
+        return garages.FirstOrDefault(x => string.Equals(x.GarageName, garageName, StringComparison.CurrentCultureIgnoreCase));
     }
 
     internal IEnumerable<string> GetGarageStrings() => garages.Select(g => g.ToString());

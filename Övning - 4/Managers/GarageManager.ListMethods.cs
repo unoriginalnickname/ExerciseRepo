@@ -4,7 +4,7 @@ using System.Text;
 
 public partial class GarageManager
 {
-    internal OperationResult ListAllGarages()
+    public OperationResult ListAllGarages()
     {
         IEnumerable<string> garages = GetGarageStrings();
         if (!garages.Any())
@@ -22,8 +22,6 @@ public partial class GarageManager
 
     public OperationResult ListVehicles(Filter f)
     {
-       // var results = garages.Select(x => x.Where(v => Matches(v, f)).Select(FilterFactory.ConvertVehicleToFilter).ToList());
-
         var results = garages
             .Select(g => (
                 Matches: g.Where(v => Matches(v, f)).Select(FilterFactory.ConvertVehicleToFilter).ToList(),
@@ -57,12 +55,14 @@ public partial class GarageManager
         return OperationResult.Ok(Filter.Header() + "\n" + string.Join("\n", lines));
     }
 
-    internal OperationResult ListSpecificGarage(string? garageName)
+    public OperationResult ListSpecificGarage(string? garageName)
     {
         if (garageName is null)
             return OperationResult.Fail("No garagename provided");
 
-        var garage = FindGarageWithName(garageName);
+        //var garage = FindGarageWithName(garageName);
+        var garage = garages.FirstOrDefault(x => string.Equals(x.GarageName, garageName, StringComparison.CurrentCultureIgnoreCase));
+
         if (garage != null)
         {
             var viewConvertedVehicles = garage

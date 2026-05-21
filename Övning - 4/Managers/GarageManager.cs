@@ -4,13 +4,20 @@ using Övning___4.ViewModel;
 public partial class GarageManager
 {
     private List<IGarage> garages = new();
-    internal OperationResult CreateGarage(string? garageTypeName, int? garageSize, string? garageName)
+    public OperationResult TryCreateGarage(string? garageVehicleType, int? garageSize, string? garageName)
     {
-        if (garageTypeName == null) { return OperationResult.Fail("Garage type name cannot be empty.");  }
+        if (garageVehicleType == null) { return OperationResult.Fail("Garage type cannot be empty.");  }
+        if (garageSize == null) { return OperationResult.Fail("Garage size cannot be empty."); }
+        if (garageName == null) { return OperationResult.Fail("Garage name cannot be empty."); }
+
         if (garageName.Length > 20)
             return OperationResult.Fail("Garage name too long, max 20 characters. ");
+       
+        if(garages.Any(x => x.GarageName == garageName))
+            return OperationResult.Fail("Garage name already exists");
 
-        string? correctedTypeName = NormalizeWord(garageTypeName);
+
+        string? correctedTypeName = NormalizeWord(garageVehicleType);
         if (garages.Any(x => x.GarageName == correctedTypeName)) { return OperationResult.Fail("Garage name already exists"); }
 
         var type = Type.GetType(correctedTypeName);
@@ -31,7 +38,7 @@ public partial class GarageManager
     //parking
     public OperationResult TryParkVehicle(Filter filter, string? garageName)
     {
-        if (garages.Any((x => x.ContainsVehicleRegNumber(filter.RegistryNumber.ToUpperInvariant()))))
+        if (RegNumberExistsAnywhere(filter.RegistryNumber.ToUpperInvariant()))
             return OperationResult.Fail("Garage already contains vehicle registration number");
 
         var vehicleType = Type.GetType(filter.VehicleType);

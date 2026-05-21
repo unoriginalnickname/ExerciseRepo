@@ -16,10 +16,10 @@ namespace Övning___4.ViewModel
             UniquePropertyString = v.UniquePropertyString
         };
 
-    
-        public static bool TryCreate(out Filter filter, out List<string> errors, string? reg = null, string? type = null, string? fuel = null, string? color = null, string? unique = null, int? wheels = null)
+
+        public static OperationResult TryCreate(out Filter filter, string? reg = null, string? type = null, string? fuel = null, string? color = null, string? unique = null, int? wheels = null)
         {
-            errors = new List<string>();
+            var errors = new List<string>();
 
             reg = reg?.Trim();
             type = type?.Trim();
@@ -30,12 +30,11 @@ namespace Övning___4.ViewModel
             string? normalizedReg = null;
             if (!string.IsNullOrWhiteSpace(reg))
             {
-                if (reg.All(char.IsLetterOrDigit))
+                if (reg.All(c => char.IsLetterOrDigit(c) || c == '-' || c == ' '))
                     normalizedReg = reg.ToUpperInvariant();
                 else
                     errors.Add("Registration number contains invalid characters.");
             }
-     
 
             string? NormalizeWord(string? s)
             {
@@ -47,8 +46,6 @@ namespace Övning___4.ViewModel
             string? normalizedColor = NormalizeWord(color);
             string? normalizedFuel = NormalizeWord(fuel);
             string? normalizedUnique = string.IsNullOrWhiteSpace(unique) ? null : unique;
-
-
 
             if (wheels is not null)
             {
@@ -66,7 +63,13 @@ namespace Övning___4.ViewModel
                 UniquePropertyValue = normalizedUnique
             };
 
-            return errors.Count == 0;
+            if (errors.Count > 0)
+            {
+                filter = null!;
+                return OperationResult.Fail(string.Join("\n", errors));
+            }
+
+            return OperationResult.Ok("Filter created successfully.");
         }
     }
 }

@@ -21,8 +21,13 @@ public class Garage<T> : IGarage where T : IVehicle
 
     public bool ContainsVehicleRegNumber(string regNumber) =>
       internalGarage.Any(v => string.Equals(v.RegistryNumber, regNumber, StringComparison.OrdinalIgnoreCase));
-    public void ParkVehicle(IVehicle vehicle) => internalGarage.Add((T)vehicle);    // Cast is safe as long as callers respect TypeOfGarage — enforced by GarageManager
+    public void ParkVehicle(IVehicle vehicle)
+    {
+        if (internalGarage.Any(v => string.Equals(v.RegistryNumber, vehicle.RegistryNumber, StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException($"A vehicle with registration number '{vehicle.RegistryNumber}' is already parked in this garage.");
 
+        internalGarage.Add((T)vehicle);
+    }
     public void Unpark(string regNumber)
     {
         if (string.IsNullOrWhiteSpace(regNumber))
