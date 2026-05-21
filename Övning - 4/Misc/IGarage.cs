@@ -18,6 +18,6 @@
 
         public void Unpark(string registryNumber);
 
-        IEnumerable<IVehicle> GetVehicles(); // instead of inheriting IEnumerable
+        IEnumerable<IVehicle> GetVehicles();
 
     }
