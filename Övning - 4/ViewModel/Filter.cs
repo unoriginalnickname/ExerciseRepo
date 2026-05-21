@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using Övning___4.Misc;
+﻿using Övning___4.Misc;
 
 namespace Övning___4.ViewModel
 {

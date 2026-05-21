@@ -1,7 +1,4 @@
 ﻿using Övning___4.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
 
 namespace Övning___4.Misc
 {

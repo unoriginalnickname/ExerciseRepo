@@ -1,6 +1,4 @@
-﻿using Övning___4.Misc;
-using System.Collections;
-using System.Security.Cryptography;
+﻿using System.Collections;
 
 public class Garage<T> : IGarage where T : IVehicle
 {

@@ -1,7 +1,5 @@
 ﻿using Övning___4.Misc;
-using Övning___4.View;
 using Övning___4.ViewModel;
-using System.Diagnostics.Metrics;
 
 public partial class GarageManager
     {

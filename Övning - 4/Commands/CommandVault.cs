@@ -1,5 +1,4 @@
 ﻿using System.CommandLine;
-using Övning___4.ViewModel;
 
 namespace Övning___4.Commands
 {

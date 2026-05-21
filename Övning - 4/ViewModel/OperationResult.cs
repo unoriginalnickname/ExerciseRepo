@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Övning___4.ViewModel
+﻿namespace Övning___4.ViewModel
 {
     public class OperationResult
     {
