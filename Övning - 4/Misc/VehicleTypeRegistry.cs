@@ -1,6 +1,6 @@
 ﻿namespace Övning___4.Misc
 {
-    static class VehicleTypeRegistry
+    public static class VehicleTypeRegistry
     {
        static readonly Dictionary<string, string> approvedVehicleTypes = new()
  {

@@ -14,7 +14,7 @@ p.GetValue(option) is string[] arr ? string.Join(" ", arr) : null;
     Option<string> regNum, Option<string> type, Option<string> fuel,
     Option<string> color, Option<string> unique, Option<int?> wheels)
         {
-            if (!FilterFactory.TryCreate(out Filter filter,
+            if (!FilterFactory.TryCreateFilter(out Filter filter,
                 p.GetValue(regNum), p.GetValue(type), p.GetValue(fuel),
                 p.GetValue(color), p.GetValue(unique), p.GetValue(wheels)).Success)
             {

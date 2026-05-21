@@ -17,9 +17,9 @@ namespace Övning___4.ViewModel
         };
 
 
-        public static OperationResult TryCreate(out Filter filter, string? reg = null, string? type = null, string? fuel = null, string? color = null, string? unique = null, int? wheels = null)
+        public static OperationResult TryCreateFilter(out Filter filter, string? reg = null, string? type = null, string? fuel = null, string? color = null, string? unique = null, int? wheels = null)
         {
-            var errors = new List<string>();
+            filter = null!;
 
             reg = reg?.Trim();
             type = type?.Trim();
@@ -28,13 +28,18 @@ namespace Övning___4.ViewModel
             unique = unique?.Trim();
 
             string? normalizedReg = null;
-            if (!string.IsNullOrWhiteSpace(reg))
+            if (reg != null)
             {
-                if (reg.All(c => char.IsLetterOrDigit(c) || c == '-' || c == ' '))
+                if (string.IsNullOrWhiteSpace(reg))
+                    return OperationResult.Fail("Registration number cannot be empty.");
+                else if (reg.All(c => char.IsLetterOrDigit(c) || c == '-' || c == ' '))
                     normalizedReg = reg.ToUpperInvariant();
                 else
-                    errors.Add("Registration number contains invalid characters.");
+                    return OperationResult.Fail("Registration number contains invalid characters.");
             }
+
+            if (wheels is not null && (wheels < MinWheels || wheels > MaxWheels))
+                return OperationResult.Fail($"Number of wheels must be between {MinWheels} and {MaxWheels}.");
 
             string? NormalizeWord(string? s)
             {
@@ -42,32 +47,15 @@ namespace Övning___4.ViewModel
                 return char.ToUpperInvariant(s![0]) + s.Substring(1).ToLowerInvariant();
             }
 
-            string? normalizedType = NormalizeWord(type);
-            string? normalizedColor = NormalizeWord(color);
-            string? normalizedFuel = NormalizeWord(fuel);
-            string? normalizedUnique = string.IsNullOrWhiteSpace(unique) ? null : unique;
-
-            if (wheels is not null)
-            {
-                if (wheels < MinWheels || wheels > MaxWheels)
-                    errors.Add($"Number of wheels must be between {MinWheels} and {MaxWheels}.");
-            }
-
             filter = new Filter
             {
                 NumWheels = wheels,
-                Color = normalizedColor,
-                FuelType = normalizedFuel,
+                Color = NormalizeWord(color),
+                FuelType = NormalizeWord(fuel),
                 RegistryNumber = normalizedReg,
-                VehicleType = normalizedType,
-                UniquePropertyValue = normalizedUnique
+                VehicleType = NormalizeWord(type),
+                UniquePropertyValue = string.IsNullOrWhiteSpace(unique) ? null : unique
             };
-
-            if (errors.Count > 0)
-            {
-                filter = null!;
-                return OperationResult.Fail(string.Join("\n", errors));
-            }
 
             return OperationResult.Ok("Filter created successfully.");
         }

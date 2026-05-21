@@ -55,7 +55,7 @@ public class FailingTests
     [InlineData("hello@world", false)]
     public void FilterFactory_RegNumberValidation(string reg, bool shouldPass)
     {
-        var success = FilterFactory.TryCreate(
+        var success = FilterFactory.TryCreateFilter(
             out var filter,
             reg: reg,
             type: "Car",
@@ -71,7 +71,7 @@ public class FailingTests
     [Fact]
     public void FilterFactory_WhenValidationFails_FilterShouldBeEmpty()
     {
-        var success = FilterFactory.TryCreate(
+        var success = FilterFactory.TryCreateFilter(
             out var filter,
             reg: "BAD REG!", // invalid — contains spaces and !
             type: null,

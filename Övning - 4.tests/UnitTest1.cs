@@ -1,8 +1,11 @@
 ﻿using Övning___4.Misc;
 using Övning___4.ViewModel;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
-public class GarageManagerTests
+public class GarageManagerTests2
 {
+
+
     // ─── Helpers ────────────────────────────────────────────────────────────
 
     private static GarageManager ManagerWithCarGarage(int size = 5, string name = "Test Cars")
@@ -32,7 +35,7 @@ public class GarageManagerTests
         Assert.True(result.Success);
     }
 
-    [Theory]
+    [Theory] // — used inline when the data is short and specific to just that one test, like the normalisation cases.
     [InlineData("Car")]
     [InlineData("Bus")]
     [InlineData("Motorcycle")]
@@ -120,7 +123,7 @@ public class GarageManagerTests
     }
 
     [Fact]
-    public void Park_FullGarage_Fails()
+    public void Park_FullGarage_Fails2()
     {
         var m = ManagerWithCarGarage(size: 1);
         m.TryParkVehicle(CarFilter("CAR001"), null);
@@ -129,7 +132,7 @@ public class GarageManagerTests
     }
 
     [Fact]
-    public void Park_SpecificGarageName_ParksThere()
+    public void Park_SpecificGarageName_ParksThere2()
     {
         var m = new GarageManager();
         m.TryCreateGarage("Car", 5, "Garage A");
@@ -151,7 +154,7 @@ public class GarageManagerTests
     // ─── Unpark ─────────────────────────────────────────────────────────────
 
     [Fact]
-    public void Unpark_ExistingVehicle_Succeeds()
+    public void Unpark_ExistingVehicle_Succeeds2()
     {
         var m = ManagerWithCarGarage();
         m.TryParkVehicle(CarFilter("DEL001"), null);
@@ -319,7 +322,7 @@ public class GarageManagerTests
     // ─── Demo / Setup helpers ─────────────────────────────────────────────────
 
     [Fact]
-    public void CreateOneOfEachGarage_Succeeds()
+    public void CreateOneOfEachGarage_Succeeds2()
     {
         var m = new GarageManager();
         var result = m.CreateOneOfEachGarage();
@@ -334,7 +337,7 @@ public class GarageManagerTests
     }
 
     [Fact]
-    public void AutoPopulate_FillsGarages()
+    public void AutoPopulate_FillsGarages2()
     {
         var m = new GarageManager();
         m.CreateOneOfEachGarage();
@@ -344,7 +347,7 @@ public class GarageManagerTests
     }
 
     [Fact]
-    public void ParkRandom_NoGarages_Fails()
+    public void ParkRandom_NoGarages_Fails2()
     {
         var m = new GarageManager();
         Assert.False(m.ParkRandom().Success);
@@ -365,18 +368,12 @@ public class GarageManagerTests
     }
 
     [Fact]
-    public void UnparkRandom_WithVehicles_Succeeds()
+    public void UnparkRandom_WithVehicles_Succeeds2()
     {
         var m = ManagerWithCarGarage();
         m.TryParkVehicle(CarFilter("RND001"), null);
         Assert.True(m.UnparkRandomVehicle().Success);
     }
-}
-
-// ─── Garage<T> direct tests ──────────────────────────────────────────────────
-
-public class GarageTests
-{
     private static Car MakeCar(string reg) => new()
     {
         RegistryNumber = reg,
@@ -384,6 +381,9 @@ public class GarageTests
         FuelType = "Electric",
         NumWheels = 4
     };
+
+
+    // ─── Garage<T> direct tests ──────────────────────────────────────────────────
 
     [Fact]
     public void NewGarage_HasAllSlotsFree()
@@ -394,7 +394,7 @@ public class GarageTests
     }
 
     [Fact]
-    public void Park_ReducesFreeSlots()
+    public void Park_ReducesFreeSlots2()
     {
         var g = new Garage<Car>(5, "Test");
         g.ParkVehicle(MakeCar("A1"));
@@ -402,7 +402,7 @@ public class GarageTests
     }
 
     [Fact]
-    public void Unpark_IncreasesFreeSlots()
+    public void Unpark_IncreasesFreeSlots2()
     {
         var g = new Garage<Car>(5, "Test");
         g.ParkVehicle(MakeCar("A1"));
@@ -444,3 +444,4 @@ public class GarageTests
         Assert.Equal(2, g.GetVehicles().Count());
     }
 }
+
