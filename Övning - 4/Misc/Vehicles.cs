@@ -1,7 +1,4 @@
-﻿using Övning___4.Misc;
-
-
-    public class Airplane : IVehicle
+﻿    public class Airplane : IVehicle
     {
         public string RegistryNumber { get; set; }
         public string Color { get; set; }

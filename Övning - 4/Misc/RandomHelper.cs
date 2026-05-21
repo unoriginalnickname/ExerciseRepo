@@ -1,5 +1,4 @@
-﻿
-namespace Övning___4.Misc
+﻿namespace Övning___4.Misc
 {
     public static class RandomHelper
     {

@@ -1,8 +1,3 @@
-using Övning___4.Misc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Övning___4.ViewModel
 {
     public static class FilterFactory
@@ -22,7 +17,7 @@ namespace Övning___4.ViewModel
         };
 
     
-        public static bool TryCreate(bool requireAllFields, out Filter filter, out List<string> errors, string? reg = null, string? type = null, string? fuel = null, string? color = null, string? unique = null, int? wheels = null)
+        public static bool TryCreate(out Filter filter, out List<string> errors, string? reg = null, string? type = null, string? fuel = null, string? color = null, string? unique = null, int? wheels = null)
         {
             errors = new List<string>();
 
@@ -40,10 +35,7 @@ namespace Övning___4.ViewModel
                 else
                     errors.Add("Registration number contains invalid characters.");
             }
-            else if (requireAllFields)
-            {
-                errors.Add("Registration number is required.");
-            }
+     
 
             string? NormalizeWord(string? s)
             {
@@ -56,12 +48,7 @@ namespace Övning___4.ViewModel
             string? normalizedFuel = NormalizeWord(fuel);
             string? normalizedUnique = string.IsNullOrWhiteSpace(unique) ? null : unique;
 
-            if (requireAllFields)
-            {
-                if (string.IsNullOrWhiteSpace(normalizedType)) errors.Add("Vehicle type is required.");
-                if (string.IsNullOrWhiteSpace(normalizedColor)) errors.Add("Color is required.");
-                if (wheels is null) errors.Add("Number of wheels is required.");
-            }
+
 
             if (wheels is not null)
             {

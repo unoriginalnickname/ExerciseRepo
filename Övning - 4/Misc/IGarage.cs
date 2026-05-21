@@ -1,7 +1,4 @@
-﻿
-
-
-    internal interface IGarage : IEnumerable<IVehicle>
+﻿    internal interface IGarage : IEnumerable<IVehicle>
     {
     public static string Header()
     {

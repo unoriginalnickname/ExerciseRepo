@@ -1,5 +1,4 @@
-﻿
-    public interface IVehicle
+﻿    public interface IVehicle
     {
         public string RegistryNumber { get; set; }
         public string Color { get; set; }
