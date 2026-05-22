@@ -22,6 +22,9 @@ public static class TestData
     new object[] { typeof(Uap) },
 };
 
+
+
+
     // Reg numbers paired with whether they should be valid
     public static IEnumerable<object[]> RegNumberValidity => new List<object[]>
     {
@@ -69,11 +72,13 @@ public static class TestData
     };
 }
 
+
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // GARAGE<T> TESTS
 // ═══════════════════════════════════════════════════════════════════════════════
 
-[Trait("Category", "Garage")] // Trait tags tests into categories. You can filter by them in the test explorer or from the terminal:
+[Trait("Category", "Garage")] // Trait tags tests into categories. You can filter by them in the test explorer or from the terminal
 public class GarageTests : IDisposable // IDisposable constructor/Dispose — GarageManagerTests creates a pre-configured manager with
                                        // 3 garages before every single test, so no test has to set up from scratch.
                                        // Dispose cleans up after.

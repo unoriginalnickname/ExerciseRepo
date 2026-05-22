@@ -3,10 +3,9 @@ using Övning___4.ViewModel;
 
 public partial class GarageManager
 {
-    private List<IGarage> garages = new();
+  private List<IGarage> garages = new();
   public OperationResult TryCreateGarage(string? garageVehicleType, int? garageSize, string? garageName)
 {
-    if (garageVehicleType == null) return OperationResult.Fail("Garage type name cannot be empty.");
     if (string.IsNullOrWhiteSpace(garageName)) return OperationResult.Fail("Garage name cannot be empty.");
     if (garageName.Length > 20) return OperationResult.Fail("Garage name too long, max 20 characters.");
     if (garages.Any(x => x.GarageName == garageName)) return OperationResult.Fail("Garage name already exists.");
@@ -84,7 +83,6 @@ public partial class GarageManager
         }
         catch (InvalidOperationException ex)
         {
-            // Shouldn't happen since we checked above — but safe to catch
             return OperationResult.Fail(ex.Message);
         }
     }
