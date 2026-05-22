@@ -255,7 +255,6 @@ public class GarageTests : IDisposable // IDisposable constructor/Dispose — Ga
         FuelType = "Electric",
         NumWheels = 4,
         UniquePropertyValue = "4",
-        UniquePropertyString = "Doors"
     };
 }
 

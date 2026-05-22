@@ -44,7 +44,7 @@ namespace Övning___4.Misc
             vehicle.NumWheels = filter.NumWheels ?? throw new ArgumentException("NumWheels is required");
             vehicle.Color = filter.Color ?? "Unknown";
             vehicle.UniquePropertyValue = filter.UniquePropertyValue ?? uniquePropertyValue[vehicleType]();
-            vehicle.UniquePropertyString = filter.UniquePropertyString ?? uniquePropertyStrings[vehicleType];
+            //vehicle.UniquePropertyString = filter.UniquePropertyString ?? uniquePropertyStrings[vehicleType];
             return vehicle;
         }
 

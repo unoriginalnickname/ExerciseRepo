@@ -1,11 +1,13 @@
-﻿public abstract class VehicleBase : IVehicle
+﻿using Övning___4.Misc;
+//test
+public abstract class VehicleBase : IVehicle
 {
     public required string RegistryNumber { get; set; }
     public required string Color { get; set; }
     public required int NumWheels { get; set; }
     public required string FuelType { get; set; }
-    public required string UniquePropertyValue { get; set; }
-    public required string UniquePropertyString { get; set; }
+    public string UniquePropertyValue { get; set; }
+    public string UniquePropertyString { get { return VehicleTypeRegistry.ApprovedVehicleTypes[this.GetType().Name]; }}
 }
 
 public class Airplane : VehicleBase {  } 
