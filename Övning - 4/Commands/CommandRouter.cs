@@ -53,7 +53,7 @@ public class CommandRouter
     public void Find(Filter filter) => Handle(garageManager.ListVehicles(filter));
 
     internal void ListSpecificGarage(string? v) => Handle(garageManager.ListSpecificGarage(v));
-    internal void CreateGarage(string? garageType, int? garageSize, string? garageName) => Handle(garageManager.CreateGarage(garageType, garageSize, garageName));
+    internal void CreateGarage(string? garageType, int? garageSize, string? garageName) => Handle(garageManager.TryCreateGarage(garageType, garageSize, garageName));
 
     internal void ListSpecificGarageContents(string[]? strings) => Handle(garageManager.ListSpecificGarage(string.Join(" ", strings)));
 

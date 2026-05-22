@@ -48,8 +48,14 @@ namespace Övning___4.Misc
             return vehicle;
         }
 
+
         public static IVehicle CreateRandomVehicle(Type type)
         {
+            ArgumentNullException.ThrowIfNull(type);
+
+            if (!uniquePropertyStrings.ContainsKey(type))
+                throw new ArgumentException($"'{type.Name}' is not a registered vehicle type.", nameof(type));
+   
             var filter = new Filter
             {
                 VehicleType = type.Name,
