@@ -7,7 +7,10 @@ public partial class GarageManager
   public OperationResult TryCreateGarage(string? garageVehicleType, int? garageSize, string? garageName)
 {
     if (string.IsNullOrWhiteSpace(garageName)) return OperationResult.Fail("Garage name cannot be empty.");
-    if (garageName.Length > 20) return OperationResult.Fail("Garage name too long, max 20 characters.");
+        if (string.IsNullOrWhiteSpace(garageVehicleType)) return OperationResult.Fail("Garage vehicle type cannot be empty.");
+        if ((garageSize == null)) return OperationResult.Fail("Garage garage size cannot be empty.");
+
+        if (garageName.Length > 20) return OperationResult.Fail("Garage name too long, max 20 characters.");
     if (garages.Any(x => x.GarageName == garageName)) return OperationResult.Fail("Garage name already exists.");
 
     string? correctedTypeName = NormalizeWord(garageVehicleType);
