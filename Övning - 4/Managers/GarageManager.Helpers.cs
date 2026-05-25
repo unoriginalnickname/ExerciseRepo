@@ -3,14 +3,14 @@
 
 public partial class GarageManager
 {
-    private OperationResult RegNumberExistsAnywhere(string regNumber)
-        {
-        if (!garages.Any(g => g.ContainsVehicleRegNumber(regNumber)))
+    private OperationResult RegIsAvailable(string regNumber)
+    {
+        if (garages.Any(g => g.ContainsVehicleRegNumber(regNumber)))
             return OperationResult.Fail("A vehicle with that registration number is already parked.");
-        return OperationResult.Ok("A vehicle was found.");
-        }
-   
-    
+        return OperationResult.Ok("Reg number isn't a duplicate. ");
+    }
+
+
     private bool Matches(IVehicle v, Filter f) =>
         (f.RegistryNumber == null || v.RegistryNumber.Equals(f.RegistryNumber, StringComparison.OrdinalIgnoreCase)) &&
         (f.NumWheels == null || v.NumWheels == f.NumWheels) &&

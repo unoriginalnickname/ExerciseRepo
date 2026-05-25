@@ -13,7 +13,7 @@ public partial class GarageManager
         {
             while (garage.HasFreeSlots)
             {
-                var vehicle = VehicleFactory.CreateRandomVehicle(garage.TypeOfGarage);
+                var vehicle = VehicleFactory.CreateRandomVehicle(garage.GarageVehicleType);
                 garage.ParkVehicle(vehicle);
             }
         }
@@ -42,7 +42,7 @@ public partial class GarageManager
             return OperationResult.Fail("All garages are full.");
 
         var garage = RandomHelper.Pick(availableGarages);
-        var vehicle = VehicleFactory.CreateRandomVehicle(garage.TypeOfGarage);
+        var vehicle = VehicleFactory.CreateRandomVehicle(garage.GarageVehicleType);
         garage.ParkVehicle(vehicle);
         return OperationResult.Ok(ParkSuccessMessage(garage, vehicle));
     }
@@ -60,7 +60,7 @@ public partial class GarageManager
         var vehicle = RandomHelper.Pick(garage.GetVehicles().ToList());
 
         garage.Unpark(vehicle.RegistryNumber);
-        return OperationResult.Ok($"Unparked {vehicle.GetType().Name} ({vehicle.RegistryNumber}) from {garage.GarageName}");
+        return OperationResult.Ok($"Unparked {vehicle.GetType().Name} ({vehicle.RegistryNumber}) from {garage.Name}");
     }
 
 }

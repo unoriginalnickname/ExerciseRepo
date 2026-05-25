@@ -108,6 +108,7 @@ public class GarageManagerTests2
         var m = ManagerWithCarGarage();
         m.TryParkVehicle(CarFilter("abc123"), null);
         var result = m.TryParkVehicle(CarFilter("ABC123"), null);
+        
         Assert.False(result.Success);
     }
 
@@ -157,9 +158,12 @@ public class GarageManagerTests2
     public void Unpark_ExistingVehicle_Succeeds2()
     {
         var m = ManagerWithCarGarage();
-        m.TryParkVehicle(CarFilter("DEL001"), null);
-        var result = m.Unpark("DEL001");
-        Assert.True(result.Success);
+        
+        OperationResult resultParking = m.TryParkVehicle(CarFilter("DEL001"), null);
+        Assert.True(resultParking.Success, resultParking.Message);
+
+        var unparkingResult = m.Unpark("DEL001");
+        Assert.True(unparkingResult.Success, unparkingResult.Message);
     }
 
     [Fact]
@@ -167,7 +171,7 @@ public class GarageManagerTests2
     {
         var m = ManagerWithCarGarage();
         var result = m.Unpark("GHOST01");
-        Assert.False(result.Success);
+        Assert.False(result.Success, result.Message);
     }
 
     [Fact]
@@ -176,7 +180,7 @@ public class GarageManagerTests2
         var m = ManagerWithCarGarage();
         m.TryParkVehicle(CarFilter("low123"), null);
         var result = m.Unpark("LOW123");
-        Assert.True(result.Success);
+        Assert.True(result.Success, result.Message);
     }
 
     [Fact]
@@ -371,8 +375,8 @@ public class GarageManagerTests2
     public void UnparkRandom_WithVehicles_Succeeds2()
     {
         var m = ManagerWithCarGarage();
-        m.TryParkVehicle(CarFilter("RND001"), null);
-        Assert.True(m.UnparkRandomVehicle().Success);
+        OperationResult result = m.TryParkVehicle(CarFilter("RND001"), null);
+        Assert.True(result.Success, result.Message);
     }
     private static Car MakeCar(string reg) => new()
     {

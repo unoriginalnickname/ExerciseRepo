@@ -10,9 +10,9 @@ public class Garage<T> : IGarage where T : IVehicle
     IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
 
     private List<T> internalGarage;
-    public Type TypeOfGarage { get; }
+    public Type GarageVehicleType { get; }
     public int MaxSize { get; }
-    public string GarageName { get; set; }
+    public string Name { get; set; }
     public Garage(int garageSize, string garageName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(garageName);
@@ -20,8 +20,8 @@ public class Garage<T> : IGarage where T : IVehicle
             throw new ArgumentOutOfRangeException(nameof(garageSize), "Garage size must be greater than zero.");
 
         internalGarage = new List<T>();
-        GarageName = garageName;
-        TypeOfGarage = typeof(T);
+        Name = garageName;
+        GarageVehicleType = typeof(T);
         MaxSize = garageSize;
     }
 
@@ -36,7 +36,7 @@ public class Garage<T> : IGarage where T : IVehicle
             throw new InvalidOperationException($"Duplicate reg number: '{vehicle.RegistryNumber}'.");
 
         if (!HasFreeSlots)
-            throw new InvalidOperationException($"Garage '{GarageName}' is full.");
+            throw new InvalidOperationException($"Garage '{Name}' is full.");
 
         internalGarage.Add((T)vehicle);
     }
@@ -59,8 +59,8 @@ public class Garage<T> : IGarage where T : IVehicle
 
     public override string ToString()
     {
-        return $"{TypeOfGarage.Name + " Garage",-20}" +
-               $"{$"\"{GarageName}\"",-25}" +
+        return $"{GarageVehicleType.Name + " Garage",-20}" +
+               $"{$"\"{Name}\"",-25}" +
                $"space:{NumFreeSlots}/{MaxSize}";
     }
 }

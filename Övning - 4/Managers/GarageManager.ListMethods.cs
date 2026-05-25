@@ -25,7 +25,7 @@ public partial class GarageManager
         var results = garages
             .Select(g => (
                 Matches: g.Where(v => Matches(v, f)).Select(FilterFactory.ConvertVehicleToFilter).ToList(),
-                g.GarageName))
+                g.Name))
             .Where(x => x.Matches.Count > 0)
             .ToList();
 
@@ -61,7 +61,7 @@ public partial class GarageManager
             return OperationResult.Fail("No garagename provided");
 
         //var garage = FindGarageWithName(garageName);
-        var garage = garages.FirstOrDefault(x => string.Equals(x.GarageName, garageName, StringComparison.CurrentCultureIgnoreCase));
+        var garage = garages.FirstOrDefault(x => string.Equals(x.Name, garageName, StringComparison.CurrentCultureIgnoreCase));
 
         if (garage != null)
         {
