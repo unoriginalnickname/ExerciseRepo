@@ -2,7 +2,7 @@
 using Övning___4.ViewModel;
 using System.Text;
 
-public partial class GarageManager //test comment
+public partial class GarageManager
 {
     public OperationResult ListAllGarages()
     {

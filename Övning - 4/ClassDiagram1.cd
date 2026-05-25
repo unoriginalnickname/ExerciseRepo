@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CommandRouter">
+    <Position X="31.25" Y="2.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAIAAgACBQAABABAAGAggAAAAAAIQAIAYAAABAAAAAI=</HashCode>
+      <FileName>Commands\CommandRouter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GarageManager">
+    <Position X="29" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABJAAAACRAAAAARgAAAAgYAAAAAAQwAAUAAAAAAABAA=</HashCode>
+      <FileName>Managers\GarageManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Garage&lt;T&gt;" BaseTypeListCollapsed="true">
+    <Position X="17.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAIAAQAAABAMAAEAAAAAAgAAQEAEAwAAAAAAAAA=</HashCode>
+      <FileName>Misc\Garage.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="VehicleBase" Collapsed="true">
+    <Position X="7.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAAAAACAAAACAAAAAAGAAAgAAAAAA=</HashCode>
+      <FileName>Misc\Vehicles.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Airplane" Collapsed="true">
+    <Position X="2.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Misc\Vehicles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Motorcycle" Collapsed="true">
+    <Position X="7.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Misc\Vehicles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Car" Collapsed="true">
+    <Position X="11.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Misc\Vehicles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Bus" Collapsed="true">
+    <Position X="14" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Misc\Vehicles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Boat" Collapsed="true">
+    <Position X="0.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Misc\Vehicles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ufo" Collapsed="true">
+    <Position X="5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Misc\Vehicles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Uap" Collapsed="true">
+    <Position X="9.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Misc\Vehicles.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Övning___4.Commands.CommandVault">
+    <Position X="34.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAQMQAAGAhAAUQFAACKEEAAIQEkAUEagAioFA=</HashCode>
+      <FileName>Commands\CommandVault.Actions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Övning___4.Misc.RandomHelper" Collapsed="true">
+    <Position X="24.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Misc\RandomHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Övning___4.Misc.VehicleFactory">
+    <Position X="19.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAgAAAAEAAAAAIAAAQAAAAAAAAAAEAAAgAAAAgA=</HashCode>
+      <FileName>Misc\VehicleFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Övning___4.Misc.VehicleTypeRegistry" Collapsed="true">
+    <Position X="22.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Misc\VehicleTypeRegistry.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Övning___4.View.View" Collapsed="true">
+    <Position X="24.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>View\View.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Övning___4.ViewModel.Filter">
+    <Position X="22.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAQAAAAAAAAAEAAAACAAAACAAAAAAGAAAoAACAAA=</HashCode>
+      <FileName>ViewModel\Filter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Övning___4.ViewModel.FilterFactory">
+    <Position X="24" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQABAAABAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\FilterFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Övning___4.ViewModel.OperationResult">
+    <Position X="26.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAAgAAABAAAAABIAAAAAA=</HashCode>
+      <FileName>ViewModel\OperationResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="IGarage">
+    <Position X="15.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAEAAIAAQAAAAAIAAAAAAAAAgAAQEAAAwAAAAAAAAA=</HashCode>
+      <FileName>Misc\IGarage.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IVehicle" Collapsed="true">
+    <Position X="7.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAAAAACAAAACAAAAAAGAAAgAAAAAA=</HashCode>
+      <FileName>Misc\IVehicle.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
