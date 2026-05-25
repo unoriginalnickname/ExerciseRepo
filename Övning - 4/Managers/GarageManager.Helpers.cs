@@ -3,8 +3,14 @@
 
 public partial class GarageManager
 {
-    private bool RegNumberExistsAnywhere(string regNumber) =>
-    garages.Any(g => g.ContainsVehicleRegNumber(regNumber));
+    private OperationResult RegNumberExistsAnywhere(string regNumber)
+        {
+        if (!garages.Any(g => g.ContainsVehicleRegNumber(regNumber)))
+            return OperationResult.Fail("A vehicle with that registration number is already parked.");
+        return OperationResult.Ok("A vehicle was found.");
+        }
+   
+    
     private bool Matches(IVehicle v, Filter f) =>
         (f.RegistryNumber == null || v.RegistryNumber.Equals(f.RegistryNumber, StringComparison.OrdinalIgnoreCase)) &&
         (f.NumWheels == null || v.NumWheels == f.NumWheels) &&
@@ -15,7 +21,7 @@ public partial class GarageManager
     private IEnumerable<IVehicle> GetAllVehicles() =>
     garages.SelectMany(g => g.GetVehicles());
 
-    string? NormalizeWord(string? s)
+    string? NormalizeWord(string s)
     {
         if (string.IsNullOrWhiteSpace(s)) return null;
         return char.ToUpperInvariant(s![0]) + s.Substring(1).ToLowerInvariant();
@@ -23,10 +29,6 @@ public partial class GarageManager
     private IGarage FindGarageContaining(string regNumber)
     {
         return garages.FirstOrDefault(g => g.ContainsVehicleRegNumber(regNumber));
-    }
-    private IGarage FindGarageWithName(string garageName)
-    {
-        return garages.FirstOrDefault(x => string.Equals(x.GarageName, garageName, StringComparison.CurrentCultureIgnoreCase));
     }
 
     internal IEnumerable<string> GetGarageStrings() => garages.Select(g => g.ToString());

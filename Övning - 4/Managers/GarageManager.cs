@@ -3,41 +3,68 @@ using Övning___4.ViewModel;
 
 public partial class GarageManager
 {
-  private List<IGarage> garages = new();
-  public OperationResult TryCreateGarage(string? garageVehicleType, int? garageSize, string? garageName)
-{
-    if (string.IsNullOrWhiteSpace(garageName)) return OperationResult.Fail("Garage name cannot be empty.");
-        if (string.IsNullOrWhiteSpace(garageVehicleType)) return OperationResult.Fail("Garage vehicle type cannot be empty.");
-        if ((garageSize == null)) return OperationResult.Fail("Garage garage size cannot be empty.");
+    private List<IGarage> garages = new();
 
-        if (garageName.Length > 20) return OperationResult.Fail("Garage name too long, max 20 characters.");
-    if (garages.Any(x => x.GarageName == garageName)) return OperationResult.Fail("Garage name already exists.");
+    OperationResult CheckGarageInputs(string garageName, string garageTypeString, int? garageSize)
+    {
+        if (string.IsNullOrWhiteSpace(garageName))
+            return OperationResult.Fail("Garage name cannot be empty.");
+        if (string.IsNullOrWhiteSpace(garageTypeString))
+            return OperationResult.Fail("Garage vehicle type cannot be empty.");
+        if ((garageSize == null))
+            return OperationResult.Fail("Garage garage size cannot be empty.");
+        if ((garageSize == 0))
+            return OperationResult.Fail("Garage garage size cannot be zero.");
+        if (garageName.Length > 20)
+            return OperationResult.Fail("Garage name too long, max 20 characters.");
+        if (garages.Any(x => x.GarageName == garageName))
+            return OperationResult.Fail("Garage name already exists.");
 
-    string? correctedTypeName = NormalizeWord(garageVehicleType);
+        return OperationResult.Ok("Garage inputs are ok. ");
+    }
 
-    var type = Type.GetType(correctedTypeName);
-    if (type == null)
-        return OperationResult.Fail($"Unknown vehicle type '{correctedTypeName}'. Use 'listgaragetypes' to see approved types.");
+    OperationResult CheckTypeValidity(Type? type)
+    {
+        if (type == null)
+            return OperationResult.Fail($"Unknown vehicle type. " +
+                $"Use 'listgaragetypes' to see approved types.");
 
-    if (!typeof(IVehicle).IsAssignableFrom(type))
-        return OperationResult.Fail($"'{correctedTypeName}' is not a valid vehicle type.");
+        if (!typeof(IVehicle).IsAssignableFrom(type))
+            return OperationResult.Fail($"Given type is not a valid vehicle type.");
+        return OperationResult.Ok("Type is ok.");
+    }
 
-    var actualGarageType = typeof(Garage<>).MakeGenericType(type);
-    var garage = (IGarage)Activator.CreateInstance(actualGarageType, garageSize ?? 55, garageName);
+    IGarage MakeGarageInstance(Type type, int size, string name)
+    {
+        Type garageType = typeof(Garage<>).MakeGenericType(type!);
+        return (IGarage)Activator.CreateInstance(garageType, size, name);
+    }
 
-    garages.Add(garage);
-    return OperationResult.Ok("Garage was added. " + garage.ToString());
-}
+    public OperationResult TryCreateGarage(string? garageTypeString,
+        int garageSize, string? garageName)
+    {
+        if (CheckGarageInputs(garageName, garageTypeString, garageSize) is
+            { Success: false } inputResult)
+            return inputResult;
+
+        Type? garageType = Type.GetType(NormalizeWord(garageTypeString));
+
+        if (CheckTypeValidity(garageType) is { Success: false } result)
+            return result;
+
+        garages.Add(MakeGarageInstance(garageType, garageSize, garageName));
+        return OperationResult.Ok($"Garage {garageName}was added. ");
+    }
 
     //parking
     public OperationResult TryParkVehicle(Filter filter, string? garageName)
     {
-        if (RegNumberExistsAnywhere(filter.RegistryNumber))
-            return OperationResult.Fail("A vehicle with that registration number is already parked.");
-
+        if (RegNumberExistsAnywhere(filter.RegistryNumber) is { Success: true } regCheckResult)
+            return regCheckResult;
+        
         var vehicleType = Type.GetType(filter.VehicleType);
-        if (vehicleType == null)
-            return OperationResult.Fail($"Unknown vehicle type '{filter.VehicleType}'.");
+        if (CheckTypeValidity(vehicleType) is { Success: true } typeCheckResult)
+            return typeCheckResult;
 
         var garage = garages.FirstOrDefault(x =>
             x.TypeOfGarage == vehicleType
