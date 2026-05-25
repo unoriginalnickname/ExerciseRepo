@@ -1,6 +1,8 @@
 ﻿using Övning___4.View;
 using Övning___4.ViewModel;
 using System.CommandLine;
+using System.Globalization;
+using System.Resources;
 
 public class CommandRouter
 {
@@ -40,7 +42,7 @@ public class CommandRouter
     public void ListAll() => Handle(garageManager.ListAllVehicles());
     internal void Exit() => run = false;
 
-   
+
     public void ListApprovedVehicleTypes() => Handle(garageManager.ListApprovedVehicleTypes());
  
 
