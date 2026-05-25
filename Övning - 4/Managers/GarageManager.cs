@@ -1,11 +1,13 @@
 ﻿using Övning___4.Misc;
 using Övning___4.ViewModel;
+using System.Xml.Linq;
 
 public partial class GarageManager
 {
     private List<IGarage> garages = new();
+    private static readonly Dictionary<string, Type> VehicleTypes; // need to add this to avoid reflection.
 
-    OperationResult ValidateGarageCreation(string garageName, string vehicleTypeString, int? size)
+    OperationResult ValidateGarageCreation(string? garageName, string? vehicleTypeString, int? size)
     {
         if (string.IsNullOrWhiteSpace(garageName))
             return OperationResult.Fail("Garage name cannot be empty.");
@@ -44,14 +46,16 @@ public partial class GarageManager
     public OperationResult TryCreateGarage(string? vehicleTypeString,
         int? size, string? name)
     {
-        if (ValidateGarageCreation(name!, vehicleTypeString!, size) is
-            { Success: false } inputResult)
-            return inputResult;
-
-        Type? vehicleType;
-
-        if (TryResolveVehicleType(vehicleTypeString!, out vehicleType) is { Success: false } result)
+ 
+        var result = ValidateGarageCreation(name, vehicleTypeString, size);
+        if (!result.Success)
             return result;
+       
+        Type? vehicleType;
+        result = TryResolveVehicleType(vehicleTypeString!, out vehicleType);
+        if (!result.Success)
+            return result;
+
         try
         {
             garages.Add(MakeGarageInstance(vehicleType!, size, name!));
@@ -66,20 +70,19 @@ public partial class GarageManager
     //parking
     public OperationResult TryParkVehicle(Filter filter, string? name)
     {
-        if (RegIsAvailable(filter.RegistryNumber) is { Success: false } regAvailabilityResult)
-            return regAvailabilityResult;
+        var result = RegIsAvailable(filter.RegistryNumber);
+        if (!result.Success)
+            return result;
         
         Type? vehicleType;
-        if (TryResolveVehicleType(filter.VehicleType, out vehicleType) is { Success: false } typeCheckResult)
-            return typeCheckResult;
+        result = TryResolveVehicleType(filter.VehicleType, out vehicleType);
+        if (!result.Success)
+            return result;
 
-        var garage = garages.FirstOrDefault(x =>
-            x.GarageVehicleType == vehicleType
-            && x.HasFreeSlots
-            && (string.IsNullOrWhiteSpace(name) || x.Name == name));
-
-        if (garage == null)
-            return OperationResult.Fail("Could not find an available garage.");
+        IGarage garage;
+        result = FindAvailableGarage(vehicleType, name, out garage);
+        if (!result.Success)
+            return result;
 
         try
         {
@@ -95,6 +98,19 @@ public partial class GarageManager
         {
             return OperationResult.Fail(ex.Message);
         }
+    }
+
+    private OperationResult FindAvailableGarage(Type? vehicleType, string? name, out IGarage garage)
+    {
+        garage = garages.FirstOrDefault(x =>
+     x.GarageVehicleType == vehicleType
+     && x.HasFreeSlots
+     && (string.IsNullOrWhiteSpace(name) || x.Name == name));
+
+        if (garage == null)
+            return OperationResult.Fail("Could not find an available garage.");
+
+        return OperationResult.Ok("An available garage was found. ");
     }
 
     private static string ParkSuccessMessage(IGarage garage, IVehicle vehicle)

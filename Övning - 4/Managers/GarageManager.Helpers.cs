@@ -31,5 +31,6 @@ public partial class GarageManager
         return garages.FirstOrDefault(g => g.ContainsVehicleRegNumber(regNumber));
     }
 
+
     internal IEnumerable<string> GetGarageStrings() => garages.Select(g => g.ToString());
 }
