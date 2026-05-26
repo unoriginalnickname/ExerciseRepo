@@ -11,11 +11,11 @@ public class GarageManagerTests2
     private static GarageManager ManagerWithCarGarage(int size = 5, string name = "Test Cars")
     {
         var m = new GarageManager();
-        m.TryCreateGarage("Car", size, name);
+        m.TryAddNewGarage("Car", size, name);
         return m;
     }
 
-    private static Filter CarFilter(string reg = "ABC123") => new()
+    private static VehicleFilter CarFilter(string reg = "ABC123") => new()
     {
         VehicleType = "Car",
         RegistryNumber = reg,
@@ -25,13 +25,13 @@ public class GarageManagerTests2
         UniquePropertyValue = "4"
     };
 
-    // ─── TryCreateGarage ───────────────────────────────────────────────────────
+    // ─── TryAddNewGarage ───────────────────────────────────────────────────────
 
     [Fact]
-    public void TryCreateGarage_ValidType_Succeeds()
+    public void TryAddNewGarage_ValidType_Succeeds()
     {
         var m = new GarageManager();
-        var result = m.TryCreateGarage("Car", 10, "MyCars");
+        var result = m.TryAddNewGarage("Car", 10, "MyCars");
         Assert.True(result.Success);
     }
 
@@ -43,43 +43,43 @@ public class GarageManagerTests2
     [InlineData("Boat")]
     [InlineData("Ufo")]
     [InlineData("Uap")]
-    public void TryCreateGarage_AllVehicleTypes_Succeed(string type)
+    public void TryAddNewGarage_AllVehicleTypes_Succeed(string type)
     {
         var m = new GarageManager();
-        var result = m.TryCreateGarage(type, 5, $"{type} Garage");
-        Assert.True(result.Success);
+        var result = m.TryAddNewGarage(type, 5, $"{type} Garage");
+        Assert.True(result.Success, result.Message);
     }
 
     [Fact]
-    public void TryCreateGarage_UnknownType_Fails()
+    public void TryAddNewGarage_UnknownType_Fails()
     {
         var m = new GarageManager();
-        var result = m.TryCreateGarage("Hovercraft", 5, "Mystery");
+        var result = m.TryAddNewGarage("Hovercraft", 5, "Mystery");
         Assert.False(result.Success);
     }
 
     [Fact]
-    public void TryCreateGarage_DuplicateName_Fails()
+    public void TryAddNewGarage_DuplicateName_Fails()
     {
         var m = new GarageManager();
-        m.TryCreateGarage("Car", 5, "MyCars");
-        var result = m.TryCreateGarage("Bus", 5, "MyCars");
+        m.TryAddNewGarage("Car", 5, "MyCars");
+        var result = m.TryAddNewGarage("Bus", 5, "MyCars");
         Assert.False(result.Success);
     }
 
     [Fact]
-    public void TryCreateGarage_NameTooLong_Fails()
+    public void TryAddNewGarage_NameTooLong_Fails()
     {
         var m = new GarageManager();
-        var result = m.TryCreateGarage("Car", 5, "ThisNameIsWayTooLongForAGarage");
+        var result = m.TryAddNewGarage("Car", 5, "ThisNameIsWayTooLongForAGarage");
         Assert.False(result.Success);
     }
 
     [Fact]
-    public void TryCreateGarage_NullType_Fails()
+    public void TryAddNewGarage_NullType_Fails()
     {
         var m = new GarageManager();
-        var result = m.TryCreateGarage(null, 5, "SomeGarage");
+        var result = m.TryAddNewGarage(null, 5, "SomeGarage");
         Assert.False(result.Success);
     }
 
@@ -108,6 +108,7 @@ public class GarageManagerTests2
         var m = ManagerWithCarGarage();
         m.TryParkVehicle(CarFilter("abc123"), null);
         var result = m.TryParkVehicle(CarFilter("ABC123"), null);
+        
         Assert.False(result.Success);
     }
 
@@ -115,7 +116,7 @@ public class GarageManagerTests2
     public void Park_WrongTypeForGarage_Fails()
     {
         var m = new GarageManager();
-        m.TryCreateGarage("Bus", 5, "Bus Garage");
+        m.TryAddNewGarage("Bus", 5, "Bus Garage");
 
         // Trying to park a Car in a Bus-only garage
         var result = m.TryParkVehicle(CarFilter(), null);
@@ -135,8 +136,8 @@ public class GarageManagerTests2
     public void Park_SpecificGarageName_ParksThere2()
     {
         var m = new GarageManager();
-        m.TryCreateGarage("Car", 5, "Garage A");
-        m.TryCreateGarage("Car", 5, "Garage B");
+        var garageAddResult1 = m.TryAddNewGarage("Car", 5, "Garage A");
+        var garageAddResult2 = m.TryAddNewGarage("Car", 5, "Garage B");
 
         var result = m.TryParkVehicle(CarFilter("AAA111"), "Garage A");
         Assert.True(result.Success);
@@ -157,17 +158,20 @@ public class GarageManagerTests2
     public void Unpark_ExistingVehicle_Succeeds2()
     {
         var m = ManagerWithCarGarage();
-        m.TryParkVehicle(CarFilter("DEL001"), null);
-        var result = m.Unpark("DEL001");
-        Assert.True(result.Success);
+        
+        OperationResult resultParking = m.TryParkVehicle(CarFilter("DEL001"), null);
+        Assert.True(resultParking.Success, resultParking.Message);
+
+        var unparkingResult = m.TryUnpark("DEL001");
+        Assert.True(unparkingResult.Success, unparkingResult.Message);
     }
 
     [Fact]
     public void Unpark_NonExistentVehicle_Fails()
     {
         var m = ManagerWithCarGarage();
-        var result = m.Unpark("GHOST01");
-        Assert.False(result.Success);
+        var result = m.TryUnpark("GHOST01");
+        Assert.False(result.Success, result.Message);
     }
 
     [Fact]
@@ -175,15 +179,15 @@ public class GarageManagerTests2
     {
         var m = ManagerWithCarGarage();
         m.TryParkVehicle(CarFilter("low123"), null);
-        var result = m.Unpark("LOW123");
-        Assert.True(result.Success);
+        var result = m.TryUnpark("LOW123");
+        Assert.True(result.Success, result.Message);
     }
 
     [Fact]
     public void Unpark_EmptyRegNumber_Fails()
     {
         var m = ManagerWithCarGarage();
-        var result = m.Unpark("");
+        var result = m.TryUnpark("");
         Assert.False(result.Success);
     }
 
@@ -192,7 +196,7 @@ public class GarageManagerTests2
     {
         var m = ManagerWithCarGarage(size: 1);
         m.TryParkVehicle(CarFilter("FULL01"), null);
-        m.Unpark("FULL01");
+        m.TryUnpark("FULL01");
         var result = m.TryParkVehicle(CarFilter("NEW001"), null);
         Assert.True(result.Success);
     }
@@ -205,7 +209,7 @@ public class GarageManagerTests2
         var m = ManagerWithCarGarage();
         m.TryParkVehicle(CarFilter("RED001"), null);
 
-        var result = m.ListVehicles(new Filter { Color = "Red" });
+        var result = m.ListVehicles(new VehicleFilter { Color = "Red" });
         Assert.True(result.Success);
         Assert.Contains("RED001", result.Message);
     }
@@ -217,7 +221,7 @@ public class GarageManagerTests2
         m.TryParkVehicle(CarFilter("FIND01"), null);
         m.TryParkVehicle(CarFilter("FIND02"), null);
 
-        var result = m.ListVehicles(new Filter { RegistryNumber = "FIND01" });
+        var result = m.ListVehicles(new VehicleFilter { RegistryNumber = "FIND01" });
         Assert.True(result.Success);
         Assert.Contains("FIND01", result.Message);
         Assert.DoesNotContain("FIND02", result.Message);
@@ -229,7 +233,7 @@ public class GarageManagerTests2
         var m = ManagerWithCarGarage();
         m.TryParkVehicle(CarFilter(), null);
 
-        var result = m.ListVehicles(new Filter { Color = "Invisible" });
+        var result = m.ListVehicles(new VehicleFilter { Color = "Invisible" });
         Assert.False(result.Success);
     }
 
@@ -239,7 +243,7 @@ public class GarageManagerTests2
         var m = ManagerWithCarGarage();
         m.TryParkVehicle(CarFilter("WHL001"), null);
 
-        var result = m.ListVehicles(new Filter { NumWheels = 4 });
+        var result = m.ListVehicles(new VehicleFilter { NumWheels = 4 });
         Assert.True(result.Success);
         Assert.Contains("WHL001", result.Message);
     }
@@ -250,7 +254,7 @@ public class GarageManagerTests2
         var m = ManagerWithCarGarage();
         m.TryParkVehicle(CarFilter("FUEL01"), null);
 
-        var result = m.ListVehicles(new Filter { FuelType = "Petrol" });
+        var result = m.ListVehicles(new VehicleFilter { FuelType = "Petrol" });
         Assert.True(result.Success);
         Assert.Contains("FUEL01", result.Message);
     }
@@ -260,7 +264,7 @@ public class GarageManagerTests2
     {
         var m = ManagerWithCarGarage();
         m.TryParkVehicle(CarFilter("MATCH1"), null);
-        m.TryParkVehicle(new Filter
+        m.TryParkVehicle(new VehicleFilter
         {
             VehicleType = "Car",
             RegistryNumber = "OTHER1",
@@ -269,7 +273,7 @@ public class GarageManagerTests2
             NumWheels = 4
         }, null);
 
-        var result = m.ListVehicles(new Filter { Color = "Red", FuelType = "Petrol" });
+        var result = m.ListVehicles(new VehicleFilter { Color = "Red", FuelType = "Petrol" });
         Assert.True(result.Success);
         Assert.Contains("MATCH1", result.Message);
         Assert.DoesNotContain("OTHER1", result.Message);
@@ -371,8 +375,8 @@ public class GarageManagerTests2
     public void UnparkRandom_WithVehicles_Succeeds2()
     {
         var m = ManagerWithCarGarage();
-        m.TryParkVehicle(CarFilter("RND001"), null);
-        Assert.True(m.UnparkRandomVehicle().Success);
+        OperationResult result = m.TryParkVehicle(CarFilter("RND001"), null);
+        Assert.True(result.Success, result.Message);
     }
     private static Car MakeCar(string reg) => new()
     {

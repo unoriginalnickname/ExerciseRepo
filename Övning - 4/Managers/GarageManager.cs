@@ -3,55 +3,112 @@ using Övning___4.ViewModel;
 
 public partial class GarageManager
 {
-  private List<IGarage> garages = new();
-  public OperationResult TryCreateGarage(string? garageVehicleType, int? garageSize, string? garageName)
-{
-    if (string.IsNullOrWhiteSpace(garageName)) return OperationResult.Fail("Garage name cannot be empty.");
-        if (string.IsNullOrWhiteSpace(garageVehicleType)) return OperationResult.Fail("Garage vehicle type cannot be empty.");
-        if ((garageSize == null)) return OperationResult.Fail("Garage garage size cannot be empty.");
+    private List<IGarage> garages = new();
 
-        if (garageName.Length > 20) return OperationResult.Fail("Garage name too long, max 20 characters.");
-    if (garages.Any(x => x.GarageName == garageName)) return OperationResult.Fail("Garage name already exists.");
-
-    string? correctedTypeName = NormalizeWord(garageVehicleType);
-
-    var type = Type.GetType(correctedTypeName);
-    if (type == null)
-        return OperationResult.Fail($"Unknown vehicle type '{correctedTypeName}'. Use 'listgaragetypes' to see approved types.");
-
-    if (!typeof(IVehicle).IsAssignableFrom(type))
-        return OperationResult.Fail($"'{correctedTypeName}' is not a valid vehicle type.");
-
-    var actualGarageType = typeof(Garage<>).MakeGenericType(type);
-    var garage = (IGarage)Activator.CreateInstance(actualGarageType, garageSize ?? 55, garageName);
-
-    garages.Add(garage);
-    return OperationResult.Ok("Garage was added. " + garage.ToString());
-}
-
-    //parking
-    public OperationResult TryParkVehicle(Filter filter, string? garageName)
+    private OperationResult TryGetVehicleType(string typeString, out Type? type)
     {
-        if (RegNumberExistsAnywhere(filter.RegistryNumber))
-            return OperationResult.Fail("A vehicle with that registration number is already parked.");
+        type = null;
+        string? normalizedString;
+        var result = TryNormalizeWord(typeString, out normalizedString);
+        if (!result.Success)
+            return result;
 
-        var vehicleType = Type.GetType(filter.VehicleType);
-        if (vehicleType == null)
-            return OperationResult.Fail($"Unknown vehicle type '{filter.VehicleType}'.");
+        type = normalizedString switch
+        {
+            "Airplane" => typeof(Airplane),
+            "Boat" => typeof(Boat),
+            "Bus" => typeof(Bus),
+            "Car" => typeof(Car),
+            "Motorcycle" => typeof(Motorcycle),
+            "Ufo" => typeof(Ufo),
+            "Uap" => typeof(Uap),
 
-        var garage = garages.FirstOrDefault(x =>
-            x.TypeOfGarage == vehicleType
-            && x.HasFreeSlots
-            && (string.IsNullOrWhiteSpace(garageName) || x.GarageName == garageName));
+            _ => null
+        };
+        return type is null ? OperationResult.Fail("Unknown vehicle type. Use 'listgaragetypes' to see approved types.")
+            : OperationResult.Ok("Found vehicletype: " + type.Name);
+    }
 
-        if (garage == null)
-            return OperationResult.Fail("Could not find an available garage.");
+    OperationResult TryMakeGarageInstance(string vehicleType, int size, string name, out IGarage? garage)
+    {
+        garage = null;
+
+        garage = vehicleType switch
+        {
+            "Airplane" => new Garage<Airplane>(size, name),
+            "Boat" => new Garage<Boat>(size, name),
+            "Bus" => new Garage<Bus>(size, name),
+            "Car" => new Garage<Car>(size, name),
+            "Motorcycle" => new Garage<Motorcycle>(size, name),
+            "Ufo" => new Garage<Uap>(size, name),
+            "Uap" => new Garage<Uap>(size, name),
+
+            _ => null
+        };
+        return garage is null ? OperationResult.Fail("Garage is null")
+            : OperationResult.Ok("Garage is ok. ");
+    }
+
+    public OperationResult TryAddNewGarage(string? vehicleTypeString,
+        int? size, string? name)
+    {
+
+        var result = ValidateGarageCreationInput(name, vehicleTypeString, size);
+        if (!result.Success)
+            return result;
+
+        string normalizedVehicleType;
+        result = TryNormalizeWord(vehicleTypeString, out normalizedVehicleType);
+        if (!result.Success)
+            return result;
+
+        IGarage? garage;
+        result = TryMakeGarageInstance(normalizedVehicleType!, (int)size!, name!, out garage);
+        if (!result.Success)
+            return result;
 
         try
         {
-            var vehicle = VehicleFactory.CreateVehicle(filter);
-            garage.ParkVehicle(vehicle);
-            return OperationResult.Ok($"Parked {vehicle.GetType().Name} in {garage.GarageName}");
+            garages.Add(garage!);
+            return OperationResult.Ok($"Garage {name} was added. ");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return OperationResult.Fail(ex.Message);
+        }
+    }
+
+    //parking
+    public OperationResult TryParkVehicle(VehicleFilter filter, string? garageName)
+    {
+        var result = RegIsAvailable(filter.RegistryNumber);
+        if (!result.Success)
+            return result;
+
+        Type? vehicleType;
+        result = TryGetVehicleType(filter.VehicleType!, out vehicleType);
+        if (!result.Success)
+            return result;
+
+        if(garageName != null)
+        result = TryNormalizeWord(garageName, out garageName);
+        if (!result.Success)
+            return result;
+
+        IGarage? garage;
+        result = TryFindAvailableGarage(vehicleType, garageName, out garage);
+        if (!result.Success)
+            return result;
+
+        try
+        {
+            IVehicle? vehicle;
+            result = VehicleFactory.TryCreateVehicle(filter, out vehicle);
+            if (!result.Success)
+                return result;
+
+            garage!.ParkVehicle(vehicle!);
+            return OperationResult.Ok($"Parked {vehicle!.GetType().Name} in {garage.Name}");
         }
         catch (InvalidOperationException ex)
         {
@@ -63,26 +120,37 @@ public partial class GarageManager
         }
     }
 
-    private static string ParkSuccessMessage(IGarage garage, IVehicle vehicle)
+    private OperationResult TryFindAvailableGarage(Type? vehicleType, string? name, out IGarage? garage)
     {
-        return $"Parked Vehicle in garage: {garage.GarageName}\n{Filter.Header()}\n{FilterFactory.ConvertVehicleToFilter(vehicle)}";
+        garage = null;
+
+        garage = garages.FirstOrDefault(x =>
+     x.GarageVehicleType == vehicleType
+     && x.HasFreeSlots
+     && (string.IsNullOrWhiteSpace(name) || string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase)));
+
+        if (garage == null)
+            return OperationResult.Fail("Could not find an available garage.");
+
+        return OperationResult.Ok("An available garage was found. ");
     }
 
-    public OperationResult Unpark(string regNumber)
+    public OperationResult TryUnpark(string regNumber)
     {
         if (string.IsNullOrWhiteSpace(regNumber))
             return OperationResult.Fail("Registration number cannot be empty.");
 
         regNumber = regNumber.Trim().ToUpperInvariant();
-        var garage = FindGarageContaining(regNumber);
 
-        if (garage == null)
-            return OperationResult.Fail($"No vehicle with reg number '{regNumber}' found.");
+        IGarage? garage;
+        var result = TryFindGarageContaining(regNumber, out garage);
+        if (!result.Success)
+            return result;
 
         try
         {
             garage.Unpark(regNumber);
-            return OperationResult.Ok($"Unparked: {regNumber} from {garage.GarageName}");
+            return OperationResult.Ok($"Unparked: {regNumber} from {garage.Name}");
         }
         catch (InvalidOperationException ex)
         {

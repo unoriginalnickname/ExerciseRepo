@@ -20,20 +20,20 @@ public partial class GarageManager
        return OperationResult.Ok (sb.ToString());
     }
 
-    public OperationResult ListVehicles(Filter f)
+    public OperationResult ListVehicles(VehicleFilter f)
     {
-        var results = garages
+        var garageResults = garages
             .Select(g => (
                 Matches: g.Where(v => Matches(v, f)).Select(FilterFactory.ConvertVehicleToFilter).ToList(),
-                g.GarageName))
+                g.Name))
             .Where(x => x.Matches.Count > 0)
             .ToList();
 
-        if (!results.Any())
+        if (!garageResults.Any())
             return OperationResult.Fail($"No vehicles found matching criteria.");
 
         StringBuilder sb = new StringBuilder();
-        foreach (var (matches, garageName) in results)
+        foreach (var (matches, garageName) in garageResults)
         {
             sb.Append($"\nFound:{matches.Count} in \"{garageName}\":\n");
             matches.ForEach(f => sb.Append(f.ToString() + "\n"));
@@ -47,22 +47,22 @@ public partial class GarageManager
         if (!garages.Any())
             return OperationResult.Fail("No garages exist");
 
-        var vehicles = GetAllVehicles();
-        if (!vehicles.Any())
-            return OperationResult.Fail("Garages are empty");
+        IEnumerable<IVehicle> vehicles;
+        var result = TryGetAllVehicles(out vehicles);
+        if (!result.Success)
+            return result;
 
         var lines = vehicles.Select(v => FilterFactory.ConvertVehicleToFilter(v).ToString());
-        return OperationResult.Ok(Filter.Header() + "\n" + string.Join("\n", lines));
+        return OperationResult.Ok(VehicleFilter.Header() + "\n" + string.Join("\n", lines));
     }
 
-    public OperationResult ListSpecificGarage(string? garageName)
+    public OperationResult TryListSpecificGarage(string? garageName)
     {
         if (garageName is null)
             return OperationResult.Fail("No garagename provided");
 
-        //var garage = FindGarageWithName(garageName);
-        var garage = garages.FirstOrDefault(x => string.Equals(x.GarageName, garageName, StringComparison.CurrentCultureIgnoreCase));
-
+        var garage = garages.FirstOrDefault(x => string.Equals(
+            x.Name, garageName, StringComparison.CurrentCultureIgnoreCase));
         if (garage != null)
         {
             var viewConvertedVehicles = garage

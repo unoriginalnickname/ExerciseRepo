@@ -31,23 +31,25 @@ namespace Övning___4.Misc
         private static readonly List<string> FuelTypes = new() { "Petrol", "Diesel", "Electric", "Hybrid" };
         private static readonly List<int> WheelOptions = new() { 2, 4, 6, 8 };
 
-        public static IVehicle CreateVehicle(Filter filter)
+        public static OperationResult TryCreateVehicle(VehicleFilter filter, out IVehicle? vehicle)
         {
-            var vehicleType = Type.GetType(filter.VehicleType)
-                ?? throw new ArgumentException($"Unknown vehicle type '{filter.VehicleType}'");
+            vehicle = null;
+            var vehicleType = Type.GetType(filter.VehicleType);
+            if (vehicleType == null)
+                return OperationResult.Fail($"Unknown vehicle type '{filter.VehicleType}'");
 
-            var vehicle = (IVehicle)(Activator.CreateInstance(vehicleType)
-                ?? throw new ArgumentException($"Could not create vehicle of type '{filter.VehicleType}'"));
+            vehicle = (IVehicle)(Activator.CreateInstance(vehicleType))!;
+            if (vehicle == null)
+               return OperationResult.Fail($"Could not create vehicle of type '{filter.VehicleType}'");
 
             vehicle.RegistryNumber = filter.RegistryNumber ?? throw new ArgumentException("RegNumber is required");
             vehicle.FuelType = filter.FuelType ?? throw new ArgumentException("FuelType is required");
             vehicle.NumWheels = filter.NumWheels ?? throw new ArgumentException("NumWheels is required");
-            vehicle.Color = filter.Color ?? "Unknown";
+            vehicle.Color = filter.Color ?? throw new ArgumentException("Color is required");
             vehicle.UniquePropertyValue = filter.UniquePropertyValue ?? uniquePropertyValue[vehicleType]();
-            //vehicle.UniquePropertyString = filter.UniquePropertyString ?? uniquePropertyStrings[vehicleType];
-            return vehicle;
-        }
 
+            return OperationResult.Ok("Vehicle was ok");
+        }
 
         public static IVehicle CreateRandomVehicle(Type type)
         {
@@ -56,7 +58,7 @@ namespace Övning___4.Misc
             if (!uniquePropertyStrings.ContainsKey(type))
                 throw new ArgumentException($"'{type.Name}' is not a registered vehicle type.", nameof(type));
    
-            var filter = new Filter
+            var filter = new VehicleFilter
             {
                 VehicleType = type.Name,
                 RegistryNumber = GenerateRegNumber(),
@@ -67,7 +69,9 @@ namespace Övning___4.Misc
                 UniquePropertyString = uniquePropertyStrings[type]
             };
 
-            return CreateVehicle(filter);
+            IVehicle? vehicle;
+            TryCreateVehicle(filter, out vehicle);
+            return vehicle!;
         }
 
         public static string GenerateRegNumber()

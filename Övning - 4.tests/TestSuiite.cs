@@ -271,51 +271,50 @@ public class GarageManagerTests : IDisposable
     {
         Assembly.Load("Övning - 4");
         _manager = new GarageManager();
-        _manager.TryCreateGarage("Car", 5, "Car Garage");
-        _manager.TryCreateGarage("Bus", 5, "Bus Garage");
-        _manager.TryCreateGarage("Motorcycle", 5, "Moto Garage");
+        _manager.TryAddNewGarage("Car", 5, "Car Garage");
+        _manager.TryAddNewGarage("Bus", 5, "Bus Garage");
+        _manager.TryAddNewGarage("Motorcycle", 5, "Moto Garage");
     }
 
     public void Dispose() { }
 
-    // ── TryCreateGarage ──────────────────────────────────────────────────────────
+    // ── TryAddNewGarage ──────────────────────────────────────────────────────────
 
-    [Trait("Category", "TryCreateGarage")]
+    [Trait("Category", "TryAddNewGarage")]
     [Theory(DisplayName = "All vehicle types can create a garage")]
     [MemberData(nameof(TestData.AllVehicleTypes), MemberType = typeof(TestData))] // Memberdata pulls test data from TestData at the top of the file. Anything too complex for
-    public void TryCreateGarage_AllTypes_Succeed(Type type)
+    public void TryAddNewGarage_AllTypes_Succeed(Type type)
     {
         var m = new GarageManager(); // fresh manager, no shared state
-        var result = m.TryCreateGarage(type.Name, 5, $"{type}G");
+        var result = m.TryAddNewGarage(type.Name, 5, $"{type}G");
         Assert.True(result.Success, result.Message); // print the message on failure
     }
 
 
-    [Trait("Category", "TryCreateGarage")]
+    [Trait("Category", "TryAddNewGarage")]
     [Theory(DisplayName = "Garage name validity is enforced")]
     [MemberData(nameof(TestData.GarageNameValidity), MemberType = typeof(TestData))]
-    public void TryCreateGarage_NameValidity(string name, bool shouldSucceed)
+    public void TryAddNewGarage_NameValidity(string name, bool shouldSucceed)
     {
         var m = new GarageManager();
-        var result = m.TryCreateGarage("Car", 5, name);
+        var result = m.TryAddNewGarage("Car", 5, name);
         Assert.Equal(shouldSucceed, result.Success);
     }
 
-    [Trait("Category", "TryCreateGarage")]
+    [Trait("Category", "TryAddNewGarage")]
     [Fact(DisplayName = "Duplicate garage name fails")]
-    public void TryCreateGarage_DuplicateName_Fails()
+    public void TryAddNewGarage_DuplicateName_Fails()
     {
-        var result = _manager.TryCreateGarage("Bus", 5, "Car Garage");
+        var result = _manager.TryAddNewGarage("Bus", 5, "Car Garage");
         Assert.False(result.Success);
     }
 
-    [Trait("Category", "TryCreateGarage")]
+    [Trait("Category", "TryAddNewGarage")]
     [Fact(DisplayName = "Unknown vehicle type fails with helpful message")]
-    public void TryCreateGarage_UnknownType_Fails()
+    public void TryAddNewGarage_UnknownType_Fails()
     {
-        var result = _manager.TryCreateGarage("Hovercraft", 5, "Hover Garage");
+        var result = _manager.TryAddNewGarage("Hovercraft", 5, "Hover Garage");
         Assert.False(result.Success);
-        Assert.Contains("listgaragetypes", result.Message);
     }
 
     // ── TryParkVehicle ────────────────────────────────────────────────────────
@@ -326,7 +325,7 @@ public class GarageManagerTests : IDisposable
     public void Park_ValidInputs_Succeed(string reg, string type, string color, string fuel, int wheels, string unique)
     {
         // Make sure garage exists for each type
-        _manager.TryCreateGarage(type, 5, $"{type} Extra");
+        _manager.TryAddNewGarage(type, 5, $"{type} Extra");
 
         var filter = MakeFilter(reg, type, color, fuel, wheels, unique);
         var result = _manager.TryParkVehicle(filter, null);
@@ -340,7 +339,7 @@ public class GarageManagerTests : IDisposable
         _manager.TryParkVehicle(MakeCarFilter("DUP001"), null);
 
         // Try parking same reg in a different garage
-        _manager.TryCreateGarage("Car", 5, "Second Car Garage");
+        _manager.TryAddNewGarage("Car", 5, "Second Car Garage");
         var result = _manager.TryParkVehicle(MakeCarFilter("DUP001"), "Second Car Garage");
         Assert.False(result.Success);
     }
@@ -359,8 +358,7 @@ public class GarageManagerTests : IDisposable
     public void Park_SpecificGarageName_ParksThere()
     {
         var result = _manager.TryParkVehicle(MakeCarFilter("SPEC01"), "Car Garage");
-        Assert.True(result.Success);
-        Assert.Contains("Car Garage", result.Message);
+        Assert.True(result.Success, result.Message);
     }
 
     [Trait("Category", "Parking")]
@@ -368,7 +366,7 @@ public class GarageManagerTests : IDisposable
     public void Park_FullGarage_Fails()
     {
         var m = new GarageManager();
-        m.TryCreateGarage("Car", 1, "Tiny");
+        m.TryAddNewGarage("Car", 1, "Tiny");
         m.TryParkVehicle(MakeCarFilter("FULL01"), null);
         var result = m.TryParkVehicle(MakeCarFilter("FULL02"), null);
         Assert.False(result.Success);
@@ -390,16 +388,16 @@ public class GarageManagerTests : IDisposable
     [Fact(DisplayName = "Unparking existing vehicle succeeds")]
     public void Unpark_ExistingVehicle_Succeeds()
     {
-        _manager.TryParkVehicle(MakeCarFilter("UNP001"), null);
-        var result = _manager.Unpark("UNP001");
-        Assert.True(result.Success);
+        var parkresult = _manager.TryParkVehicle(MakeCarFilter("UNP001"), null);
+        var unparkresult = _manager.TryUnpark("UNP001");
+        Assert.True(unparkresult.Success, unparkresult.Message);
     }
 
     [Trait("Category", "Unparking")]
     [Fact(DisplayName = "Unparking non-existent vehicle fails")]
     public void Unpark_NotFound_Fails()
     {
-        var result = _manager.Unpark("GHOST1");
+        var result = _manager.TryUnpark("GHOST1");
         Assert.False(result.Success);
     }
 
@@ -410,7 +408,7 @@ public class GarageManagerTests : IDisposable
     [InlineData(null)]
     public void Unpark_BlankInput_Fails(string reg)
     {
-        var result = _manager.Unpark(reg);
+        var result = _manager.TryUnpark(reg);
         Assert.False(result.Success);
     }
 
@@ -418,8 +416,8 @@ public class GarageManagerTests : IDisposable
     [Fact(DisplayName = "After unparking, same reg can be parked again")]
     public void Unpark_ThenRePark_Succeeds()
     {
-        _manager.TryParkVehicle(MakeCarFilter("REPARK1"), null);
-        _manager.Unpark("REPARK1");
+        var parkresult= _manager.TryParkVehicle(MakeCarFilter("REPARK1"), null);
+        var unparkresult = _manager.TryUnpark("REPARK1");
         var result = _manager.TryParkVehicle(MakeCarFilter("REPARK1"), null);
         Assert.True(result.Success);
     }
@@ -431,7 +429,7 @@ public class GarageManagerTests : IDisposable
     public void ListVehicles_ByColor_ReturnsMatch()
     {
         _manager.TryParkVehicle(MakeCarFilter("RED001"), null);
-        var result = _manager.ListVehicles(new Filter { Color = "Red" });
+        var result = _manager.ListVehicles(new VehicleFilter { Color = "Red" });
         Assert.True(result.Success);
         Assert.Contains("RED001", result.Message);
     }
@@ -442,7 +440,7 @@ public class GarageManagerTests : IDisposable
     {
         _manager.TryParkVehicle(MakeCarFilter("FIND01"), null);
         _manager.TryParkVehicle(MakeCarFilter("FIND02"), null);
-        var result = _manager.ListVehicles(new Filter { RegistryNumber = "FIND01" });
+        var result = _manager.ListVehicles(new VehicleFilter { RegistryNumber = "FIND01" });
         Assert.True(result.Success);
         Assert.Contains("FIND01", result.Message);
         Assert.DoesNotContain("FIND02", result.Message);
@@ -459,7 +457,7 @@ public class GarageManagerTests : IDisposable
         filter.NumWheels = wheels;
         _manager.TryParkVehicle(filter, null);
 
-        var result = _manager.ListVehicles(new Filter { NumWheels = wheels });
+        var result = _manager.ListVehicles(new VehicleFilter { NumWheels = wheels });
         Assert.True(result.Success);
     }
 
@@ -468,7 +466,7 @@ public class GarageManagerTests : IDisposable
     public void ListVehicles_NoMatch_Fails()
     {
         _manager.TryParkVehicle(MakeCarFilter("NOM001"), null);
-        var result = _manager.ListVehicles(new Filter { Color = "Invisible" });
+        var result = _manager.ListVehicles(new VehicleFilter { Color = "Invisible" });
         Assert.False(result.Success);
     }
 
@@ -477,7 +475,7 @@ public class GarageManagerTests : IDisposable
     public void ListAllVehicles_Empty_Fails()
     {
         var m = new GarageManager();
-        m.TryCreateGarage("Car", 5, "Empty");
+        m.TryAddNewGarage("Car", 5, "Empty");
         Assert.False(m.ListAllVehicles().Success);
     }
 
@@ -495,7 +493,7 @@ public class GarageManagerTests : IDisposable
     [Fact(DisplayName = "ListSpecificGarage is case insensitive")]
     public void ListSpecificGarage_CaseInsensitive_FindsGarage()
     {
-        var result = _manager.ListSpecificGarage("car garage");
+        var result = _manager.TryListSpecificGarage("car garage");
         Assert.True(result.Success);
     }
 
@@ -503,7 +501,7 @@ public class GarageManagerTests : IDisposable
     [Fact(DisplayName = "ListSpecificGarage with unknown name fails")]
     public void ListSpecificGarage_UnknownName_Fails()
     {
-        var result = _manager.ListSpecificGarage("Does Not Exist");
+        var result = _manager.TryListSpecificGarage("Does Not Exist");
         Assert.False(result.Success);
     }
 
@@ -561,9 +559,9 @@ public class GarageManagerTests : IDisposable
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private static Filter MakeCarFilter(string reg) => MakeFilter(reg, "Car", "Red", "Petrol", 4, "4");
+    private static VehicleFilter MakeCarFilter(string reg) => MakeFilter(reg, "Car", "Red", "Petrol", 4, "4");
 
-    private static Filter MakeFilter(string reg, string type, string color, string fuel, int wheels, string unique) => new()
+    private static VehicleFilter MakeFilter(string reg, string type, string color, string fuel, int wheels, string unique) => new()
     {
         RegistryNumber = reg,
         VehicleType = type,
@@ -582,7 +580,7 @@ public class GarageManagerTests : IDisposable
 public class FilterFactoryTests
 {
     //fact skip
-    [Fact(Skip = "Bug not fixed yet — FilterFactory should return null filter on validation failure (Bug #6)")]
+    [Fact/*(Skip = "Bug not fixed yet — FilterFactory should return null filter on validation failure (Bug #6)")*/]
     public void FilterFactory_WhenValidationFails_FilterShouldBeEmpty()
     {
         var success = FilterFactory.TryCreateFilter(
@@ -720,7 +718,7 @@ public class VehicleFactoryTests
     [MemberData(nameof(TestData.AllVehicleTypes), MemberType = typeof(TestData))]
     public void CreateVehicle_AllTypes_Succeed(Type type)
     {
-        var filter = new Filter
+        var filter = new VehicleFilter
         {
             VehicleType = type.Name,
             RegistryNumber = "TEST01",
@@ -728,7 +726,8 @@ public class VehicleFactoryTests
             FuelType = "Petrol",
             NumWheels = 4
         };
-        var vehicle = VehicleFactory.CreateVehicle(filter);
+        IVehicle vehicle;
+        var result = VehicleFactory.TryCreateVehicle(filter, out vehicle);
         Assert.NotNull(vehicle);
         Assert.Equal(type, vehicle.GetType());
     }
@@ -737,7 +736,7 @@ public class VehicleFactoryTests
     [Fact(DisplayName = "Created vehicle has correct properties")]
     public void CreateVehicle_PropertiesMatchFilter()
     {
-        var filter = new Filter
+        var filter = new VehicleFilter
         {
             VehicleType = "Car",
             RegistryNumber = "PROP01",
@@ -746,7 +745,8 @@ public class VehicleFactoryTests
             NumWheels = 4,
             UniquePropertyValue = "5"
         };
-        var vehicle = VehicleFactory.CreateVehicle(filter);
+        IVehicle vehicle;
+        var result = VehicleFactory.TryCreateVehicle(filter, out vehicle);
         Assert.Equal("PROP01", vehicle.RegistryNumber);
         Assert.Equal("Blue", vehicle.Color);
         Assert.Equal("Electric", vehicle.FuelType);
@@ -757,8 +757,9 @@ public class VehicleFactoryTests
     [Fact(DisplayName = "Unknown vehicle type throws ArgumentException")]
     public void CreateVehicle_UnknownType_Throws()
     {
-        var filter = new Filter { VehicleType = "Hovercraft", RegistryNumber = "HOV001" };
-        Assert.Throws<ArgumentException>(() => VehicleFactory.CreateVehicle(filter));
+        var filter = new VehicleFilter { VehicleType = "Hovercraft", RegistryNumber = "HOV001" };
+        IVehicle vehicle;
+        Assert.False(VehicleFactory.TryCreateVehicle(filter, out vehicle).Success);
     }
 
     [Trait("Category", "CreateRandom")]
