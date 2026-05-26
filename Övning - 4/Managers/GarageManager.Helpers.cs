@@ -12,7 +12,23 @@ public partial class GarageManager
         return OperationResult.Ok("Reg number isn't a duplicate. ");
     }
 
+    OperationResult ValidateGarageCreationInput(string? garageName, string? vehicleTypeString, int? size)
+    {
+        if (string.IsNullOrWhiteSpace(garageName))
+            return OperationResult.Fail("Garage name cannot be empty.");
+        if (string.IsNullOrWhiteSpace(vehicleTypeString))
+            return OperationResult.Fail("Garage vehicle type cannot be empty.");
+        if ((size == null))
+            return OperationResult.Fail("Garage garage size cannot be empty.");
+        if ((size == 0))
+            return OperationResult.Fail("Garage garage size cannot be zero.");
+        if (garageName.Length > 20)
+            return OperationResult.Fail("Garage name too long, max 20 characters.");
+        if (garages.Any(x => x.Name == garageName))
+            return OperationResult.Fail("Garage name already exists.");
 
+        return OperationResult.Ok("Garage inputs are ok. ");
+    }
     private bool Matches(IVehicle v, VehicleFilter f) =>
         (f.RegistryNumber == null || v.RegistryNumber.Equals(f.RegistryNumber, StringComparison.OrdinalIgnoreCase)) &&
         (f.NumWheels == null || v.NumWheels == f.NumWheels) &&

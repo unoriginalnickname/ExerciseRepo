@@ -4,23 +4,6 @@ using Övning___4.ViewModel;
 public partial class GarageManager
 {
     private List<IGarage> garages = new();
-    OperationResult ValidateGarageCreationInput(string? garageName, string? vehicleTypeString, int? size)
-    {
-        if (string.IsNullOrWhiteSpace(garageName))
-            return OperationResult.Fail("Garage name cannot be empty.");
-        if (string.IsNullOrWhiteSpace(vehicleTypeString))
-            return OperationResult.Fail("Garage vehicle type cannot be empty.");
-        if ((size == null))
-            return OperationResult.Fail("Garage garage size cannot be empty.");
-        if ((size == 0))
-            return OperationResult.Fail("Garage garage size cannot be zero.");
-        if (garageName.Length > 20)
-            return OperationResult.Fail("Garage name too long, max 20 characters.");
-        if (garages.Any(x => x.Name == garageName))
-            return OperationResult.Fail("Garage name already exists.");
-
-        return OperationResult.Ok("Garage inputs are ok. ");
-    }
 
     private OperationResult TryGetVehicleType(string typeString, out Type? type)
     {

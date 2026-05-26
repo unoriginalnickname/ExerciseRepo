@@ -57,9 +57,10 @@ public partial class GarageManager
         }
 
         var garage = RandomHelper.Pick(garagesWithVehicles);
+
         var vehicle = RandomHelper.Pick(garage.GetVehicles().ToList());
 
-        garage.Unpark(vehicle.RegistryNumber);
-        return OperationResult.Ok($"Unparked {vehicle.GetType().Name} ({vehicle.RegistryNumber}) from {garage.Name}");
+        return TryUnpark(vehicle.RegistryNumber);
+
     }
 }
