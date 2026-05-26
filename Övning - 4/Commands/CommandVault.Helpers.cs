@@ -10,11 +10,11 @@ namespace Övning___4.Commands
 p.GetValue(option) is string[] arr ? string.Join(" ", arr) : null;
 
 
-        private Filter? GetVehicleFilter(ParseResult p,
+        private VehicleFilter? GetVehicleFilter(ParseResult p,
     Option<string> regNum, Option<string> type, Option<string> fuel,
     Option<string> color, Option<string> unique, Option<int?> wheels)
         {
-            if (!FilterFactory.TryCreateFilter(out Filter filter,
+            if (!FilterFactory.TryCreateFilter(out VehicleFilter filter,
                 p.GetValue(regNum), p.GetValue(type), p.GetValue(fuel),
                 p.GetValue(color), p.GetValue(unique), p.GetValue(wheels)).Success)
             {

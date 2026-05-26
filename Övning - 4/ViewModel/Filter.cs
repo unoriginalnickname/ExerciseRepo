@@ -2,7 +2,7 @@
 
 namespace Övning___4.ViewModel
 {
-    public class Filter
+    public class VehicleFilter
     {
         public string? VehicleType { get; set; }
         public string? FuelType { get; set; }
@@ -30,10 +30,6 @@ namespace Övning___4.ViewModel
                 $"{"Wheels",-6}" +
                 $"{"Fuel",-10}" +
                 $"{"Details"}";
-        }
-        internal IVehicle ToVehicle()
-        {
-           return VehicleFactory.CreateVehicle(this);
         }
     }
 }

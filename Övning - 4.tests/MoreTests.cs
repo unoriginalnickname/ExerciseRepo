@@ -3,33 +3,33 @@
 public class FailingTests
 {
     [Fact]
-    public void TryCreateGarage_NullName_ReturnsFailInsteadOfThrowing()
+    public void TryAddNewGarage_NullName_ReturnsFailInsteadOfThrowing()
     {
         var m = new GarageManager();
-        var result = m.TryCreateGarage("Car", 5, null);
+        var result = m.TryAddNewGarage("Car", 5, null);
         Assert.False(result.Success);
     }
 
     [Fact]
-    public void TryCreateGarage_DuplicateName_ActuallyFails()
+    public void TryAddNewGarage_DuplicateName_ActuallyFails()
     {
         var m = new GarageManager();
-        m.TryCreateGarage("Car", 5, "MyGarage");
+        m.TryAddNewGarage("Car", 5, "MyGarage");
 
         // Second call with the same name — should Fail, but currently Succeeds
-        var result = m.TryCreateGarage("Bus", 5, "MyGarage");
+        var result = m.TryAddNewGarage("Bus", 5, "MyGarage");
         Assert.False(result.Success);
     }
 
 
     [Fact]
-    public void TryCreateGarage_AllCapsTypeName_Succeeds()
+    public void TryAddNewGarage_AllCapsTypeName_Succeeds()
     {
         var m = new GarageManager();
         // NormalizeWord("CAR") → "Car" → should resolve fine
         // Currently fails because Type.GetType("Car") returns null when the
         // assembly isn't searched — depends on runtime; worth guarding explicitly
-        var result = m.TryCreateGarage("CAR", 5, "UpperCaseTest");
+        var result = m.TryAddNewGarage("CAR", 5, "UpperCaseTest");
         Assert.True(result.Success);
     }
 
@@ -91,10 +91,10 @@ public class FailingTests
     public void ListSpecificGarage_CaseInsensitiveName_FindsGarage()
     {
         var m = new GarageManager();
-        m.TryCreateGarage("Car", 5, "My Cars");
+        m.TryAddNewGarage("Car", 5, "My Cars");
 
         // All lowercase — should still find the garage
-        var result = m.ListSpecificGarage("my cars");
+        var result = m.TryListSpecificGarage("my cars");
         Assert.True(result.Success);
     }
 

@@ -5,7 +5,7 @@ namespace Övning___4.ViewModel
         private const int MinWheels = 0;
         private const int MaxWheels = 18;
 
-        public static Filter ConvertVehicleToFilter(IVehicle v) => new Filter
+        public static VehicleFilter ConvertVehicleToFilter(IVehicle v) => new VehicleFilter
         {
             VehicleType = v.GetType().Name,
             RegistryNumber = v.RegistryNumber,
@@ -17,7 +17,7 @@ namespace Övning___4.ViewModel
         };
 
 
-        public static OperationResult TryCreateFilter(out Filter filter, string? reg = null, string? type = null, string? fuel = null, string? color = null, string? unique = null, int? wheels = null)
+        public static OperationResult TryCreateFilter(out VehicleFilter filter, string? reg = null, string? type = null, string? fuel = null, string? color = null, string? unique = null, int? wheels = null)
         {
             filter = null!;
 
@@ -47,7 +47,7 @@ namespace Övning___4.ViewModel
                 return char.ToUpperInvariant(s![0]) + s.Substring(1).ToLowerInvariant();
             }
 
-            filter = new Filter
+            filter = new VehicleFilter
             {
                 NumWheels = wheels,
                 Color = NormalizeWord(color),
